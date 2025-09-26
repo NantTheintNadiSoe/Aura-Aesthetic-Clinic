@@ -1,0 +1,71 @@
+body {
+    background-color: pink;
+  }
+
+
+
+.gradient {
+    background: linear-gradient(135deg, #D6A6B8 0%, #BA9EA8 100%);
+}
+
+.body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #FFF8F5 0%, #FAE8E0 100%);
+    min-height: 100vh;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #BA9EA8 0%, #D6A6B8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.contact-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.contact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(186, 158, 168, 0.25);
+}
+
+.form-input:focus {
+    border-color: #BA9EA8 !important;
+    box-shadow: 0 0 0 3px rgba(186, 158, 168, 0.2);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #BA9EA8 0%, #D6A6B8 100%);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(186, 158, 168, 0.4);
+}
+
+.contact-icon {
+    background: linear-gradient(135deg, #FAE8E0 0%, #FFF8F5 100%);
+    box-shadow: 0 4px 12px rgba(186, 158, 168, 0.15);
+}
+
+.map-container {
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.social-icon {
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
+}
+
+/* FAQ Page */
