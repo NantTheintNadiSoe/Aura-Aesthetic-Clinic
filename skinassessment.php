@@ -3,7 +3,7 @@ session_start();
 include('connect.php');
 include('AutoIDFunction.php');
 
-if (!isset($_SESSION['pid'])) {
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
     echo "<script>window.alert('Cannot Access Data Please Login!')</script>";
     echo "<script>window.location='login.php'</script>";
     exit();
@@ -75,7 +75,14 @@ if (isset($_POST['btnsubmit'])) {
             <!-- Name -->
             <div>
                 <label class="block font-medium mb-1">Name</label>
-                <input type="text" name="name" value="<?php echo $_SESSION['pname']; ?>"
+                <input type="text" name="name"
+                    value="<?php
+                            if (isset($_SESSION['pid'])) {
+                                echo $_SESSION['pname'];
+                            } else {
+                                echo ''; // staff login ဖြစ်ရင် အလွတ်ထား
+                            }
+                            ?>"
                     class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
                     required />
             </div>
@@ -83,7 +90,14 @@ if (isset($_POST['btnsubmit'])) {
             <!-- Email -->
             <div>
                 <label class="block font-medium mb-1">Email</label>
-                <input type="email" name="email" value="<?php echo $_SESSION['pemail']; ?>"
+                <input type="email" name="email"
+                    value="<?php
+                            if (isset($_SESSION['pid'])) {
+                                echo $_SESSION['pemail'];
+                            } else {
+                                echo '';
+                            }
+                            ?>"
                     class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
                     required />
             </div>
@@ -91,10 +105,18 @@ if (isset($_POST['btnsubmit'])) {
             <!-- Phone -->
             <div>
                 <label class="block font-medium mb-1">Phone Number</label>
-                <input type="text" name="phone" value="<?php echo $_SESSION['pphone']; ?>"
+                <input type="text" name="phone"
+                    value="<?php
+                            if (isset($_SESSION['pid'])) {
+                                echo $_SESSION['pphone'];
+                            } else {
+                                echo '';
+                            }
+                            ?>"
                     class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
                     required />
             </div>
+
 
             <!-- Date Of Birth -->
             <div>

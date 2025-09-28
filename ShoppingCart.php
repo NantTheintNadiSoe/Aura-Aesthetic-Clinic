@@ -3,7 +3,7 @@ session_start();
 include('connect.php');
 include('ShoppingCartFunction.php');
 
-if (!isset($_SESSION['pid'])) {
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
     echo "<script>window.alert('Cannot Access Data Please Login!')</script>";
     echo "<script>window.location='login.php'</script>";
     exit();

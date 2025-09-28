@@ -4,9 +4,9 @@ include('connect.php');
 include('AutoIDFunction.php');
 
 // Only allow access if patient is logged in
-if (!isset($_SESSION['pid'])) {
-    echo "<script>alert('Access denied! Please login first.');</script>";
-    echo "<script>window.location='login.php';</script>";
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
+    echo "<script>window.alert('Cannot Access Data Please Login!')</script>";
+    echo "<script>window.location='login.php'</script>";
     exit();
 }
 
