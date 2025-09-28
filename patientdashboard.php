@@ -2,15 +2,21 @@
 session_start();
 include('connect.php');
 include 'header.php';
+
 if (!isset($_SESSION['pid'])) {
     echo "<script>alert('Please log in to access the dashboard.'); window.location='login.php';</script>";
     exit();
 }
+
 $patientID = $_SESSION['pid'];
 $patientName = $_SESSION['pname'] ?? 'Patient';
 
 // Fetch recommendations
-$query = "SELECT r.RecommendationCode, r.RecommendationDate, r.IsNotified, r.FollowUpDate FROM recommendation r JOIN skinassessment sa ON r.AssessmentCode = sa.AssessmentCode WHERE sa.PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' ORDER BY r.RecommendationDate DESC";
+$query = "SELECT r.RecommendationCode, r.RecommendationDate, r.IsNotified, r.FollowUpDate
+          FROM recommendation r
+          JOIN skinassessment sa ON r.AssessmentCode = sa.AssessmentCode
+          WHERE sa.PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "'
+          ORDER BY r.RecommendationDate DESC";
 $result = mysqli_query($connect, $query);
 $recommendationCount = $result ? mysqli_num_rows($result) : 0;
 $newRecommendationCount = 0;
@@ -18,11 +24,13 @@ if ($result) {
     foreach (mysqli_fetch_all($result, MYSQLI_ASSOC) as $row) {
         if ($row['IsNotified']) $newRecommendationCount++;
     }
-    mysqli_data_seek($result, 0); // Reset pointer for table
+    mysqli_data_seek($result, 0);
 }
 
 // Fetch invoices
-$query_invoices = "SELECT InvoiceCode, InvoiceDate, Payment FROM invoice WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' ORDER BY InvoiceDate DESC";
+$query_invoices = "SELECT InvoiceCode, InvoiceDate, Payment FROM invoice
+                   WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "'
+                   ORDER BY InvoiceDate DESC";
 $invoices = mysqli_query($connect, $query_invoices);
 $invoiceCount = $invoices ? mysqli_num_rows($invoices) : 0;
 $unpaidCount = 0;
@@ -32,7 +40,57 @@ if ($invoices) {
     }
     mysqli_data_seek($invoices, 0);
 }
+
+// Fetch new confirmed appointment
+$pendingAppointmentsQuery = "SELECT AppointmentCode, AppointmentDate, AppointmentTime, Status FROM appointment WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' AND Status != 'Confirmed' ORDER BY AppointmentDate DESC, AppointmentTime DESC";
+$pendingAppointmentsResult = mysqli_query($connect, $pendingAppointmentsQuery);
+$apptNotifyQuery = "SELECT AppointmentCode, AppointmentDate, AppointmentTime
+                    FROM appointment
+                    WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "'
+                    AND Status = 'Confirmed' AND IsNotified = 1
+                    ORDER BY AppointmentDate DESC, AppointmentTime DESC LIMIT 1";
+$apptNotifyResult = mysqli_query($connect, $apptNotifyQuery);
+$newConfirmedAppointment = $apptNotifyResult && mysqli_num_rows($apptNotifyResult) > 0
+    ? mysqli_fetch_assoc($apptNotifyResult) : null;
+if ($newConfirmedAppointment) {
+    mysqli_query($connect, "UPDATE appointment SET IsNotified = 0
+                            WHERE AppointmentCode = '" . mysqli_real_escape_string($connect, $newConfirmedAppointment['AppointmentCode']) . "'");
+}
+
+// Fetch new confirmed order
+$pendingOrdersQuery = "SELECT OrderCode, OrderDate, TotalAmount, Status FROM orders WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' AND Status != 'Confirmed' ORDER BY OrderDate DESC";
+$pendingOrdersResult = mysqli_query($connect, $pendingOrdersQuery);
+$orderNotifyQuery = "SELECT OrderCode, OrderDate, TotalAmount
+                     FROM orders
+                     WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "'
+                     AND Status = 'Confirmed' AND IsNotified = 1
+                     ORDER BY OrderDate DESC LIMIT 1";
+$orderNotifyResult = mysqli_query($connect, $orderNotifyQuery);
+$newConfirmedOrder = $orderNotifyResult && mysqli_num_rows($orderNotifyResult) > 0
+    ? mysqli_fetch_assoc($orderNotifyResult) : null;
+if ($newConfirmedOrder) {
+    mysqli_query($connect, "UPDATE orders SET IsNotified = 0
+                            WHERE OrderCode = '" . mysqli_real_escape_string($connect, $newConfirmedOrder['OrderCode']) . "'");
+}
+
+// Fetch new confirmed skin assessment
+$pendingConsultsQuery = "SELECT AssessmentCode, AssessmentDate, SkinConcern, Status FROM skinassessment WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' AND Status != 'Confirmed' ORDER BY AssessmentDate DESC";
+$pendingConsultsResult = mysqli_query($connect, $pendingConsultsQuery);
+$skinNotifyQuery = "SELECT AssessmentCode, AssessmentDate, SkinConcern
+                    FROM skinassessment
+                    WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "'
+                    AND Status = 'Confirmed' AND IsNotified = 1
+                    ORDER BY AssessmentDate DESC LIMIT 1";
+$skinNotifyResult = mysqli_query($connect, $skinNotifyQuery);
+$newConfirmedSkin = $skinNotifyResult && mysqli_num_rows($skinNotifyResult) > 0
+    ? mysqli_fetch_assoc($skinNotifyResult) : null;
+if ($newConfirmedSkin) {
+    mysqli_query($connect, "UPDATE skinassessment SET IsNotified = 0
+                            WHERE AssessmentCode = '" . mysqli_real_escape_string($connect, $newConfirmedSkin['AssessmentCode']) . "'");
+}
 ?>
+
+
 <?php include 'header.php'; ?>
 <?php include 'navbar.php'; ?>
 
@@ -92,16 +150,120 @@ if ($invoices) {
                 </div>
             </div>
 
-            <!-- Upcoming Appointments (Placeholder) -->
+
+
+            <!-- Appointment Notification -->
+            <?php if ($newConfirmedAppointment): ?>
+                <div class="mb-6 bg-green-100 border border-green-300 text-green-800 rounded-xl shadow p-6 text-center font-semibold">
+                    Your appointment on <span class="font-bold"><?= htmlspecialchars($newConfirmedAppointment['AppointmentDate']) ?></span> at <span class="font-bold"><?= htmlspecialchars($newConfirmedAppointment['AppointmentTime']) ?></span> has been <span class="text-green-700">confirmed</span>!
+                </div>
+            <?php endif; ?>
+
+            <!-- Order Notification -->
+            <?php if ($newConfirmedOrder): ?>
+                <div class="mb-6 bg-blue-100 border border-blue-300 text-blue-800 rounded-xl shadow p-6 text-center font-semibold">
+                    Your order <span class="font-bold"><?= htmlspecialchars($newConfirmedOrder['OrderCode']) ?></span> placed on <span class="font-bold"><?= htmlspecialchars($newConfirmedOrder['OrderDate']) ?></span> (MMK <?= number_format($newConfirmedOrder['TotalAmount'], 2) ?>) has been <span class="text-blue-700">confirmed</span>!
+                </div>
+            <?php endif; ?>
+
+            <!-- Skin Assessment Notification -->
+            <?php if ($newConfirmedSkin): ?>
+                <div class="mb-6 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-xl shadow p-6 text-center font-semibold">
+                    Your skin assessment on <span class="font-bold"><?= htmlspecialchars($newConfirmedSkin['AssessmentDate']) ?></span> (Concern: <span class="font-bold"><?= htmlspecialchars($newConfirmedSkin['SkinConcern']) ?></span>) has been <span class="text-yellow-700">confirmed</span>!
+                </div>
+            <?php endif; ?>
+
+            <!-- Pending Appointments -->
             <section class="mb-12">
-                <h2 class="text-2xl font-bold text-[#916D7A] mb-4">Upcoming Appointments</h2>
-                <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No upcoming appointments found.</div>
+                <h2 class="text-2xl font-bold text-[#916D7A] mb-4">Pending Appointments</h2>
+                <?php if ($pendingAppointmentsResult && mysqli_num_rows($pendingAppointmentsResult) > 0): ?>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="bg-[#916D7A] text-white">
+                                    <th class="border border-gray-300 px-4 py-2">Code</th>
+                                    <th class="border border-gray-300 px-4 py-2">Date</th>
+                                    <th class="border border-gray-300 px-4 py-2">Time</th>
+                                    <th class="border border-gray-300 px-4 py-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_assoc($pendingAppointmentsResult)): ?>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['AppointmentCode']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['AppointmentDate']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['AppointmentTime']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold text-yellow-600"><?= htmlspecialchars($row['Status']) ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No pending appointments found.</div>
+                <?php endif; ?>
             </section>
 
-            <!-- Recent Treatments (Placeholder) -->
+            <!-- Pending Orders -->
             <section class="mb-12">
-                <h2 class="text-2xl font-bold text-[#916D7A] mb-4">Recent Treatments</h2>
-                <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No recent treatments found.</div>
+                <h2 class="text-2xl font-bold text-[#916D7A] mb-4">Pending Orders</h2>
+                <?php if ($pendingOrdersResult && mysqli_num_rows($pendingOrdersResult) > 0): ?>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="bg-[#916D7A] text-white">
+                                    <th class="border border-gray-300 px-4 py-2">Code</th>
+                                    <th class="border border-gray-300 px-4 py-2">Date</th>
+                                    <th class="border border-gray-300 px-4 py-2">Amount</th>
+                                    <th class="border border-gray-300 px-4 py-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_assoc($pendingOrdersResult)): ?>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['OrderCode']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['OrderDate']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2">MMK <?= number_format($row['TotalAmount'], 2) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold text-yellow-600"><?= htmlspecialchars($row['Status']) ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No pending orders found.</div>
+                <?php endif; ?>
+            </section>
+
+            <!-- Pending Consultations -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-[#916D7A] mb-4">Pending Consultations</h2>
+                <?php if ($pendingConsultsResult && mysqli_num_rows($pendingConsultsResult) > 0): ?>
+                    <div class="overflow-x-auto">
+                        <table class="w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+                            <thead>
+                                <tr class="bg-[#916D7A] text-white">
+                                    <th class="border border-gray-300 px-4 py-2">Code</th>
+                                    <th class="border border-gray-300 px-4 py-2">Date</th>
+                                    <th class="border border-gray-300 px-4 py-2">Concern</th>
+                                    <th class="border border-gray-300 px-4 py-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php while ($row = mysqli_fetch_assoc($pendingConsultsResult)): ?>
+                                    <tr>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['AssessmentCode']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['AssessmentDate']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2"><?= htmlspecialchars($row['SkinConcern']) ?></td>
+                                        <td class="border border-gray-300 px-4 py-2 font-semibold text-yellow-600"><?= htmlspecialchars($row['Status']) ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">No pending consultations found.</div>
+                <?php endif; ?>
             </section>
 
             <!-- Recommendations Table -->
