@@ -23,7 +23,7 @@ if (isset($_GET['delete_consultation'])) {
 // Handle consultation confirmation
 if (isset($_GET['confirm_consultation'])) {
     $confID = mysqli_real_escape_string($connect, $_GET['confirm_consultation']);
-    $confQuery = mysqli_query($connect, "UPDATE consultation SET Status='Confirmed' WHERE ConsultationCode='$confID'");
+    $confQuery = mysqli_query($connect, "UPDATE consultation SET Status='Confirmed', IsNotified=1 WHERE ConsultationCode='$confID'");
     if ($confQuery) {
         echo "<script>alert('Consultation confirmed!'); window.location='consultationlist.php';</script>";
         exit();

@@ -7,15 +7,28 @@ if (!isset($_SESSION['sid']) || !isset($_SESSION['position'])) {
 }
 $role = $_SESSION['position'];
 
+
 // Handle skin assessment deletion
 if (isset($_GET['delete_assessment'])) {
-    $delID = mysqli_real_escape_string($conn, $_GET['delete_assessment']);
-    $delQuery = mysqli_query($conn, "DELETE FROM skinassessment WHERE AssessmentCode='$delID'");
+    $delID = mysqli_real_escape_string($connect, $_GET['delete_assessment']);
+    $delQuery = mysqli_query($connect, "DELETE FROM skinassessment WHERE AssessmentCode='$delID'");
     if ($delQuery) {
         echo "<script>alert('Skin assessment deleted successfully!'); window.location='skinassessmentlist.php';</script>";
         exit();
     } else {
         echo "<script>alert('Failed to delete skin assessment.');</script>";
+    }
+}
+
+// Handle skin assessment confirmation
+if (isset($_GET['confirm_assessment'])) {
+    $confID = mysqli_real_escape_string($connect, $_GET['confirm_assessment']);
+    $confQuery = mysqli_query($connect, "UPDATE skinassessment SET Status='Confirmed', IsNotified=1 WHERE AssessmentCode='$confID'");
+    if ($confQuery) {
+        echo "<script>alert('Skin assessment confirmed!'); window.location='skinassessmentlist.php';</script>";
+        exit();
+    } else {
+        echo "<script>alert('Failed to confirm skin assessment.');</script>";
     }
 }
 
@@ -38,7 +51,7 @@ include('navbar.php');
             </thead>
             <tbody>
                 <?php
-                $assessQuery = mysqli_query($conn, "SELECT sa.*, p.Name AS PatientName FROM skinassessment sa LEFT JOIN patientregister p ON sa.PatientID = p.PatientID ORDER BY AssessmentDate DESC");
+                $assessQuery = mysqli_query($connect, "SELECT sa.*, p.Name AS PatientName FROM skinassessment sa LEFT JOIN patientregister p ON sa.PatientID = p.PatientID ORDER BY AssessmentDate DESC");
                 if ($assessQuery && mysqli_num_rows($assessQuery) > 0):
                     while ($a = mysqli_fetch_assoc($assessQuery)):
                 ?>
@@ -48,6 +61,7 @@ include('navbar.php');
                             <td class="py-2 px-4 border-b"><?= htmlspecialchars($a['SkinConcern']) ?></td>
                             <td class="py-2 px-4 border-b"><?= htmlspecialchars($a['SkinCondition']) ?></td>
                             <td class="py-2 px-4 border-b text-center">
+                                <a href="view_skinassessment.php?code=<?= urlencode($a['AssessmentCode']) ?>" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 mr-2">View</a>
                                 <a href="skinassessmentlist.php?delete_assessment=<?= urlencode($a['AssessmentCode']) ?>" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700" onclick="return confirm('Delete this skin assessment?');">Delete</a>
                             </td>
                         </tr>

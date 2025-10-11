@@ -21,7 +21,7 @@ if (isset($_GET['delete_appointment'])) {
 // Handle appointment confirmation
 if (isset($_GET['confirm_appointment'])) {
     $confID = mysqli_real_escape_string($connect, $_GET['confirm_appointment']);
-    $confQuery = mysqli_query($connect, "UPDATE appointment SET Status='Confirmed' WHERE AppointmentCode='$confID'");
+    $confQuery = mysqli_query($connect, "UPDATE appointment SET Status='Confirmed', IsNotified=1 WHERE AppointmentCode='$confID'");
     if ($confQuery) {
         echo "<script>alert('Appointment confirmed!'); window.location='appointmentlist.php';</script>";
         exit();

@@ -33,7 +33,10 @@ if (isset($_GET['PID'])) {
     <section class="max-w-6xl mx-auto mt-12 px-6 mb-20">
         <h1 class="text-4xl font-extrabold text-[#916D7A] mb-8 border-b border-[#EBD5DC] pb-4">Shopping Cart</h1>
 
-        <?php if (!isset($_SESSION['ShoppingCart']) || count($_SESSION['ShoppingCart']) == 0): ?>
+        <?php
+        // Use correct cart for staff or patient
+        $cartName = isset($_SESSION['sid']) ? 'StaffCart' : 'ShoppingCart';
+        if (!isset($_SESSION[$cartName]) || count($_SESSION[$cartName]) == 0): ?>
             <p class="text-center text-[#6E4B57] text-lg mt-20">Your cart is empty.</p>
         <?php else: ?>
             <div class="overflow-x-auto">
@@ -53,7 +56,7 @@ if (isset($_GET['PID'])) {
                     <tbody>
                         <?php
                         $grandTotal = 0;
-                        foreach ($_SESSION['ShoppingCart'] as $item):
+                        foreach ($_SESSION[$cartName] as $item):
                             $PID = $item['ProductCode'];
                             $PName = $item['ProductName'];
                             $PImage = $item['ProductImage'];

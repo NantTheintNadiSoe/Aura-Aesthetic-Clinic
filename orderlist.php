@@ -21,7 +21,7 @@ if (isset($_GET['delete_order'])) {
 // Handle order confirmation
 if (isset($_GET['confirm_order'])) {
     $confID = mysqli_real_escape_string($connect, $_GET['confirm_order']);
-    $confQuery = mysqli_query($connect, "UPDATE `order` SET Status='Confirmed' WHERE OrderCode='$confID'");
+    $confQuery = mysqli_query($connect, "UPDATE orders SET Status='Confirmed', IsNotified=1 WHERE OrderCode='$confID'");
     if ($confQuery) {
         echo "<script>alert('Order confirmed!'); window.location='orderlist.php';</script>";
         exit();

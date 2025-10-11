@@ -1,5 +1,145 @@
-<?php include('connect.php'); ?>
-<!-- Navbar -->
+<?php
+// navbar.php
+if (session_status() === PHP_SESSION_NONE) session_start();
+include('connect.php');
+
+// Initialize notification variables
+$patientNotiCount = 0;
+$patientNotiItems = [];
+$staffNotiCount = 0;
+$staffNotiItems = [];
+
+/* ------------------- PATIENT NOTIFICATIONS ------------------- */
+if (isset($_SESSION['pid'])) {
+    $pid = mysqli_real_escape_string($connect, $_SESSION['pid']);
+
+    // Recommendations
+    $q = mysqli_query($connect, "
+        SELECT r.RecommendationDate
+        FROM recommendation r
+        JOIN skinassessment sa ON r.AssessmentCode = sa.AssessmentCode
+        WHERE sa.PatientID = '$pid' AND r.IsNotified = 1
+        ORDER BY r.RecommendationDate DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $patientNotiCount++;
+        $patientNotiItems[] = "<div class='px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            New recommendation on <b>" . htmlspecialchars($r['RecommendationDate']) . "</b>
+        </div>";
+    }
+
+    // Confirmed Appointments
+    $q = mysqli_query($connect, "
+        SELECT AppointmentDate, AppointmentTime
+        FROM appointment
+        WHERE PatientID='$pid' AND Status='Confirmed' AND IsNotified=1
+        ORDER BY AppointmentDate DESC, AppointmentTime DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $patientNotiCount++;
+        $patientNotiItems[] = "<div class='px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            Appointment confirmed for <b>" . htmlspecialchars($r['AppointmentDate']) . "</b> at <b>" . htmlspecialchars($r['AppointmentTime']) . "</b>
+        </div>";
+    }
+
+    // Confirmed Orders
+    $q = mysqli_query($connect, "
+        SELECT OrderCode, OrderDate, TotalAmount
+        FROM orders
+        WHERE PatientID='$pid' AND Status='Confirmed' AND IsNotified=1
+        ORDER BY OrderDate DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $patientNotiCount++;
+        $patientNotiItems[] = "<div class='px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            Order <b>" . htmlspecialchars($r['OrderCode']) . "</b> confirmed on <b>" . htmlspecialchars($r['OrderDate']) . "</b> (MMK " . number_format($r['TotalAmount'], 2) . ")
+        </div>";
+    }
+
+    // Confirmed Skin Assessments
+    $q = mysqli_query($connect, "
+        SELECT AssessmentDate, SkinConcern
+        FROM skinassessment
+        WHERE PatientID='$pid' AND Status='Confirmed' AND IsNotified=1
+        ORDER BY AssessmentDate DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $patientNotiCount++;
+        $patientNotiItems[] = "<div class='px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            Consultation confirmed on <b>" . htmlspecialchars($r['AssessmentDate']) . "</b> (Concern: <b>" . htmlspecialchars($r['SkinConcern']) . "</b>)
+        </div>";
+    }
+}
+
+/* ------------------- STAFF NOTIFICATIONS ------------------- */
+if (isset($_SESSION['sid'])) {
+    $sid = mysqli_real_escape_string($connect, $_SESSION['sid']);
+
+    $staffNotiCount = 0;
+    $staffNotiItems = [];
+
+    // 1. Pending Appointments
+    $q = mysqli_query($connect, "
+        SELECT a.AppointmentCode, a.AppointmentDate, a.AppointmentTime, p.Name
+        FROM appointment a
+        JOIN patientregister p ON a.PatientID = p.PatientID
+        WHERE a.Status != 'Active' 
+        ORDER BY a.AppointmentDate DESC, a.AppointmentTime DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $staffNotiCount++;
+        $staffNotiItems[] = "<a href='appointmentlist.php#" . htmlspecialchars($r['AppointmentCode']) . "' class='block px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            New appointment: <b>" . htmlspecialchars($r['Name']) . "</b> on <b>" . htmlspecialchars($r['AppointmentDate']) . "</b> at <b>" . htmlspecialchars($r['AppointmentTime']) . "</b>
+        </a>";
+    }
+
+    // 2. Pending Orders
+    $q = mysqli_query($connect, "
+        SELECT o.OrderCode, o.OrderDate, p.Name
+        FROM orders o
+        JOIN patientregister p ON o.PatientID = p.PatientID
+        WHERE o.Status != 'Active' 
+        ORDER BY o.OrderDate DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $staffNotiCount++;
+        $staffNotiItems[] = "<a href='orderlist.php#" . htmlspecialchars($r['OrderCode']) . "' class='block px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            New order: <b>" . htmlspecialchars($r['Name']) . "</b> on <b>" . htmlspecialchars($r['OrderDate']) . "</b>
+        </a>";
+    }
+
+    // 3. Pending Consultations
+    $q = mysqli_query($connect, "
+        SELECT c.ConsultationCode, c.ConsultationDate, c.ConsultationTime, p.Name
+        FROM consultation c
+        JOIN patientregister p ON c.PatientID = p.PatientID
+        WHERE c.Status != 'Active' 
+        ORDER BY c.ConsultationDate DESC, c.ConsultationTime DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $staffNotiCount++;
+        $staffNotiItems[] = "<a href='consultationlist.php#" . htmlspecialchars($r['ConsultationCode']) . "' class='block px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            New consultation: <b>" . htmlspecialchars($r['Name']) . "</b> on <b>" . htmlspecialchars($r['ConsultationDate']) . "</b> at <b>" . htmlspecialchars($r['ConsultationTime']) . "</b>
+        </a>";
+    }
+
+    // 4. Pending Skin Assessments
+    $q = mysqli_query($connect, "
+        SELECT sa.AssessmentCode, sa.AssessmentDate, p.Name
+        FROM skinassessment sa
+        JOIN patientregister p ON sa.PatientID = p.PatientID
+        WHERE sa.Status != 'Active' 
+        ORDER BY sa.AssessmentDate DESC
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $staffNotiCount++;
+        $staffNotiItems[] = "<a href='skinassessmentlist.php#" . htmlspecialchars($r['AssessmentCode']) . "' class='block px-4 py-2 border-b text-sm hover:bg-[#F7EFEF]'>
+            New skin assessment: <b>" . htmlspecialchars($r['Name']) . "</b> on <b>" . htmlspecialchars($r['AssessmentDate']) . "</b>
+        </a>";
+    }
+}
+?>
+<!-- NAVBAR -->
 <nav class="flex items-center justify-between bg-[#916D7A] px-6 py-4 shadow-md text-white relative z-50">
     <!-- Logo -->
     <div class="flex items-center space-x-3">
@@ -25,54 +165,50 @@
         <a href="appointment.php" class="hidden lg:inline px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#916D7A] transition">
             Book Appointment
         </a>
-        <!-- Notification Bell Icon for Patients -->
+
+        <!-- Notifications & Cart -->
         <?php if (isset($_SESSION['pid'])): ?>
-            <?php
-            // Count new notifications for patient
-            $notiCount = 0;
-            $pid = $_SESSION['pid'];
-            include_once 'connect.php';
-            // New confirmed appointment
-            $notiCount += mysqli_num_rows(mysqli_query($connect, "SELECT 1 FROM appointment WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1"));
-            // New confirmed order
-            $notiCount += mysqli_num_rows(mysqli_query($connect, "SELECT 1 FROM orders WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1"));
-            // New confirmed consultation (skinassessment)
-            $notiCount += mysqli_num_rows(mysqli_query($connect, "SELECT 1 FROM skinassessment WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1"));
-            // New recommendations
-            $notiCount += mysqli_num_rows(mysqli_query($connect, "SELECT 1 FROM recommendation r JOIN skinassessment sa ON r.AssessmentCode = sa.AssessmentCode WHERE sa.PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND r.IsNotified = 1"));
-            ?>
+            <!-- Patient Notifications -->
             <div class="relative">
-                <button onclick="toggleDropdown('notiDropdown')" class="focus:outline-none" title="Notifications">
+                <button onclick="toggleDropdown('patientNotiDropdown'); markPatientNotificationsRead();" class="focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71z" />
                     </svg>
-                    <?php if ($notiCount > 0): ?>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5"><?php echo $notiCount; ?></span>
+                    <?php if ($patientNotiCount > 0): ?>
+                        <span id="patientNotiBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5"><?= $patientNotiCount ?></span>
                     <?php endif; ?>
                 </button>
-                <!-- Dropdown for notifications -->
-                <div id="notiDropdown" class="absolute right-0 mt-2 w-80 bg-white text-gray-700 rounded shadow-lg hidden z-50">
-                    <div class="p-4 border-b font-semibold text-[#916D7A]">Notifications</div>
-                    <div class="max-h-72 overflow-y-auto">
+                <div id="patientNotiDropdown" class="absolute right-0 mt-2 w-96 bg-white text-gray-700 rounded shadow-lg hidden z-50">
+                    <div class="p-4 border-b font-semibold text-[#916D7A]">Your Notifications</div>
+                    <div class="max-h-96 overflow-y-auto">
                         <?php
-                        // Show each notification type
-                        $apptRes = mysqli_query($connect, "SELECT AppointmentDate, AppointmentTime FROM appointment WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1");
-                        while ($row = mysqli_fetch_assoc($apptRes)) {
-                            echo '<div class="px-4 py-2 border-b text-sm">Appointment confirmed for <b>' . htmlspecialchars($row['AppointmentDate']) . '</b> at <b>' . htmlspecialchars($row['AppointmentTime']) . '</b></div>';
+                        if (!empty($patientNotiItems)) {
+                            foreach ($patientNotiItems as $item) echo $item;
+                        } else {
+                            echo '<div class="px-4 py-6 text-center text-gray-400">No new notifications.</div>';
                         }
-                        $orderRes = mysqli_query($connect, "SELECT OrderCode, OrderDate FROM orders WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1");
-                        while ($row = mysqli_fetch_assoc($orderRes)) {
-                            echo '<div class="px-4 py-2 border-b text-sm">Order <b>' . htmlspecialchars($row['OrderCode']) . '</b> confirmed on <b>' . htmlspecialchars($row['OrderDate']) . '</b></div>';
-                        }
-                        $skinRes = mysqli_query($connect, "SELECT AssessmentDate, SkinConcern FROM skinassessment WHERE PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND Status = 'Confirmed' AND IsNotified = 1");
-                        while ($row = mysqli_fetch_assoc($skinRes)) {
-                            echo '<div class="px-4 py-2 border-b text-sm">Consultation confirmed for <b>' . htmlspecialchars($row['AssessmentDate']) . '</b> (Concern: ' . htmlspecialchars($row['SkinConcern']) . ')</div>';
-                        }
-                        $recRes = mysqli_query($connect, "SELECT r.RecommendationDate FROM recommendation r JOIN skinassessment sa ON r.AssessmentCode = sa.AssessmentCode WHERE sa.PatientID = '" . mysqli_real_escape_string($connect, $pid) . "' AND r.IsNotified = 1");
-                        while ($row = mysqli_fetch_assoc($recRes)) {
-                            echo '<div class="px-4 py-2 border-b text-sm">New recommendation on <b>' . htmlspecialchars($row['RecommendationDate']) . '</b></div>';
-                        }
-                        if ($notiCount == 0) {
+                        ?>
+                    </div>
+                </div>
+            </div>
+        <?php elseif (isset($_SESSION['sid'])): ?>
+            <!-- Staff Notifications -->
+            <div class="relative">
+                <button onclick="toggleDropdown('staffNotiDropdown'); markStaffNotificationsRead();" class="focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-6V11c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-1.29 1.29A1 1 0 0 0 6 19h12a1 1 0 0 0 .71-1.71z" />
+                    </svg>
+                    <?php if ($staffNotiCount > 0): ?>
+                        <span id="staffNotiBadge" class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full px-2 py-0.5"><?= $staffNotiCount ?></span>
+                    <?php endif; ?>
+                </button>
+                <div id="staffNotiDropdown" class="absolute right-0 mt-2 w-96 bg-white text-gray-700 rounded shadow-lg hidden z-50">
+                    <div class="p-4 border-b font-semibold text-[#916D7A]">Staff Notifications</div>
+                    <div class="max-h-96 overflow-y-auto">
+                        <?php
+                        if (!empty($staffNotiItems)) {
+                            foreach ($staffNotiItems as $item) echo $item;
+                        } else {
                             echo '<div class="px-4 py-6 text-center text-gray-400">No new notifications.</div>';
                         }
                         ?>
@@ -81,42 +217,34 @@
             </div>
         <?php endif; ?>
 
-        <!-- Shopping Cart Icon with Notification Badge -->
+        <!-- Shopping Cart -->
         <div class="relative">
             <a href="ShoppingCart.php" title="View Cart">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275.5-.737.775T15.55 13H8.1L7 15h11q.425 0 .713.288T19 16t-.288.713T18 17H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H2q-.425 0-.712-.288T1 3t.288-.712T2 2h1.625q.275 0 .525.15t.375.425z" />
+                    <path fill="currentColor" d="M7 22q-.825 0-1.412-.587T5 20t.588-1.412T7 18t1.413.588T9 20t-.587 1.413T7 22m10 0q-.825 0-1.412-.587T15 20t.588-1.412T17 18t1.413.588T19 20t-.587 1.413T17 22M5.2 4h14.75q.575 0 .875.513t.025 1.037l-3.55 6.4q-.275 0-.737.775T15.55 13H8.1L7 15h11q.425 0 .713.288T19 16t-.288.713T18 17H7q-1.125 0-1.7-.987t-.05-1.963L6.6 11.6L3 4H2q-.425 0-.712-.288T1 3t.288-.712T2 2h1.625q.275 0 .525.15t.375.425z" />
                 </svg>
                 <?php
-                // Show cart badge only for patients
-                if (isset($_SESSION['pid'])) {
-                    include_once 'ShoppingCartFunction.php';
-                    $cartCount = 0;
-                    if (isset($_SESSION['ShoppingCart'])) {
-                        $cartCount = 0;
-                        foreach ($_SESSION['ShoppingCart'] as $item) {
-                            $cartCount += isset($item['Quantity']) ? $item['Quantity'] : 1;
-                        }
-                    }
-                    if ($cartCount > 0) {
-                        echo '<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">' . $cartCount . '</span>';
-                    }
+                $cartCount = 0;
+                if (isset($_SESSION['pid']) && isset($_SESSION['ShoppingCart'])) {
+                    foreach ($_SESSION['ShoppingCart'] as $item) $cartCount += $item['Quantity'] ?? 1;
+                } elseif (isset($_SESSION['sid']) && isset($_SESSION['StaffCart'])) {
+                    foreach ($_SESSION['StaffCart'] as $item) $cartCount += $item['Quantity'] ?? 1;
                 }
+                if ($cartCount > 0) echo '<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">' . $cartCount . '</span>';
                 ?>
             </a>
         </div>
 
-        <!-- Login/Profile -->
+        <!-- Profile / Login -->
         <?php
-        if (!isset($_SESSION['sid']) && !isset($_SESSION['pid'])) {
-            // Not logged in
+        if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
             echo '<a href="login.php" title="Patient Login">
                     <svg class="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M12 12c2.28 0 4-1.72 4-4s-1.72-4-4-4-4 1.72-4 4 1.72 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                   </a>';
         } elseif (isset($_SESSION['pid'])) {
-            $name = $_SESSION['pname']; ?>
+            $name = $_SESSION['pname'] ?? 'Patient'; ?>
             <div class="relative">
                 <button onclick="toggleDropdown('userDropdown')" class="flex items-center space-x-2 focus:outline-none">
                     <span class="text-lg font-semibold hidden lg:inline"><?= htmlspecialchars($name) ?></span>
@@ -130,7 +258,7 @@
                 </div>
             </div>
         <?php } elseif (isset($_SESSION['sid'])) {
-            $staffName = $_SESSION['sname']; ?>
+            $staffName = $_SESSION['sname'] ?? 'Staff'; ?>
             <div class="relative">
                 <button onclick="toggleDropdown('staffDropdown')" class="flex items-center space-x-2 focus:outline-none">
                     <span class="text-lg font-semibold hidden lg:inline"><?= htmlspecialchars($staffName) ?></span>
@@ -164,37 +292,61 @@
     </div>
 </nav>
 
-<!-- Scripts -->
 <script>
     function toggleDropdown(id) {
-        document.getElementById(id).classList.toggle('hidden');
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden');
     }
 
     function toggleMenu() {
-        document.getElementById('mobile-menu').classList.toggle('hidden');
+        const m = document.getElementById('mobile-menu');
+        if (!m) return;
+        m.classList.toggle('hidden');
     }
 
-    // Toggle notification dropdown
-    function toggleDropdown(id) {
-        document.getElementById(id).classList.toggle('hidden');
-    }
-    // Close dropdowns and mobile menu if clicked outside
-    window.addEventListener('click', function(e) {
-        const dropdowns = ['userDropdown', 'staffDropdown'];
-        dropdowns.forEach(id => {
-            const dropdown = document.getElementById(id);
-            if (!dropdown) return;
-            const button = dropdown.previousElementSibling;
-            if (!dropdown.contains(e.target) && !button.contains(e.target)) {
-                dropdown.classList.add('hidden');
+    function markPatientNotificationsRead() {
+        var badge = document.getElementById('patientNotiBadge');
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'mark_notifications_read.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.success && badge) badge.remove();
+                } catch (e) {}
             }
-        });
+        };
+        xhr.send('mark=1');
+    }
 
-        // Mobile menu
+    function markStaffNotificationsRead() {
+        var badge = document.getElementById('staffNotiBadge');
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'mark_staff_notifications_read.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.success && badge) badge.remove();
+                } catch (e) {}
+            }
+        };
+        xhr.send('mark=1');
+    }
+
+    window.addEventListener('click', function(e) {
+        const ids = ['userDropdown', 'staffDropdown', 'patientNotiDropdown', 'staffNotiDropdown'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const button = el.previousElementSibling;
+            if (!el.contains(e.target) && (!button || !button.contains(e.target))) el.classList.add('hidden');
+        });
         const mobileMenu = document.getElementById('mobile-menu');
         const hamburger = document.querySelector('button[onclick="toggleMenu()"]');
-        if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
-            mobileMenu.classList.add('hidden');
-        }
+        if (mobileMenu && hamburger && !mobileMenu.contains(e.target) && !hamburger.contains(e.target)) mobileMenu.classList.add('hidden');
     });
 </script>
