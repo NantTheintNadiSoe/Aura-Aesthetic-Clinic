@@ -23,7 +23,7 @@ if (isset($_POST['btnsubmit'])) {
     $quantity = $_POST['quantity'];
     $discount = $_POST['discount'];
     $description = $_POST['description'];
-    $status = 'Available';  // Fixed status value
+    $status = 'Available';  
 
     // Handle image upload
     if (isset($_FILES['fileimage'])) {
@@ -81,7 +81,7 @@ if (isset($_POST['btnsubmit'])) {
         <div class="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md border border-[#EBD5DC] mb-8 sm:mb-12 lg:mb-20">
             <form action="product.php" method="POST" class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-x-6 lg:gap-y-5" enctype="multipart/form-data">
 
-                <!-- Product Code (readonly) -->
+                <!-- Product Code -->
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Product Code</label>
                     <input type="text" name="product_code"
@@ -206,14 +206,14 @@ if (isset($_POST['btnsubmit'])) {
                         class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
-                <!-- Description (spans both columns on lg+) -->
+                <!-- Description  -->
                 <div class="lg:col-span-2">
                     <label class="block font-medium mb-1 text-sm sm:text-base">Description</label>
                     <textarea name="description" rows="4"
                         class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base resize-none"></textarea>
                 </div>
 
-                <!-- Submit Button (spans both columns on lg+) -->
+                <!-- Submit Button -->
                 <div class="lg:col-span-2 text-center pt-4">
                     <button type="submit" name="btnsubmit"
                         class="px-4 sm:px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#6E4B57] transition font-semibold text-sm sm:text-base w-full">

@@ -60,7 +60,7 @@ if (isset($_POST['btnsubmit'])) {
 
         $query = mysqli_query($connect, $insert);
         if ($query) {
-            echo "<script>alert('Registration successful!'); window.location='stafflogin.php';</script>";
+            echo "<script>alert('Registration successful!'); window.location='login.php';</script>";
         } else {
             echo "<script>alert('Registration failed! Please try again.'); window.location='staffregister.php';</script>";
         }
@@ -87,7 +87,7 @@ if (isset($_POST['btnsubmit'])) {
                 </div>
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Profile Image</label>
-                    <input type="file" name="profile_image" accept="image/*"
+                    <input type="file" required name="profile_image" accept="image/*"
                         class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#916D7A] file:text-white hover:file:bg-[#6E4B57]" />
                 </div>
                 <div>
@@ -122,7 +122,7 @@ if (isset($_POST['btnsubmit'])) {
                         <option value="" disabled selected>Select Position</option>
                         <option value="Aesthetic Doctor">Aesthetic Doctor</option>
                         <option value="Dermatologist">Dermatologist</option>
-                        <option value="Aesthetician">Aesthetician</option>
+                        <option value="Aesthetician">Nurse</option>
                         <option value="Admin">Admin</option>
                         <option value="Receptionist">Receptionist</option>
                         <option value="Clinic Manager">Clinic Manager</option>

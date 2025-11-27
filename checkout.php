@@ -10,7 +10,7 @@ if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
     exit();
 }
 
-// Determine which cart to use
+
 $cartName = isset($_SESSION['sid']) ? 'StaffCart' : 'ShoppingCart';
 
 // Redirect if cart is empty
@@ -19,12 +19,12 @@ if (!isset($_SESSION[$cartName]) || count($_SESSION[$cartName]) == 0) {
     exit();
 }
 
-// Generate hidden OrderCode
+
 $orderCode = AutoID("orders", "OrderCode", "Ord_", 6);
 
 // Handle order submission
 if (isset($_POST['btnPlaceOrder'])) {
-    $userID = isset($_SESSION['pid']) ? $_SESSION['tpid'] : $_SESSION['sid'];
+    $userID = isset($_SESSION['pid']) ? $_SESSION['pid'] : $_SESSION['sid'];
     $orderCodeInput = mysqli_real_escape_string($connect, $_POST['order_code']);
     $Name = mysqli_real_escape_string($connect, $_POST['Name']);
     $email = mysqli_real_escape_string($connect, $_POST['email']);
@@ -127,7 +127,7 @@ if (isset($_POST['btnPlaceOrder'])) {
             </table>
         </div>
 
-        <!-- Summary -->
+   
         <div class="bg-white p-6 rounded-lg shadow-md border border-[#EBD5DC] w-full mb-10">
             <p class="text-lg font-semibold text-[#4A2C35] mb-2">
                 Total Quantity: <span class="font-mono"><?php echo CalculateTotalQuantity(); ?></span>

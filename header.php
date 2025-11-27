@@ -25,10 +25,10 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Boxicons -->
+
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
-    <!-- Playfair Display (via jsDelivr, avoids Google Fonts timeout) -->
+
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@latest/700.css" rel="stylesheet">
 
     <!-- Font Awesome -->

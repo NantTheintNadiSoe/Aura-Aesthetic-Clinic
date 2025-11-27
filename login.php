@@ -6,16 +6,15 @@ if (isset($_POST['btnlogin'])) {
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
 
-    // ---- 1. Check Staff ----
+    // ---- Staff ----
     $select_staff = "SELECT * FROM staffregister WHERE Email='$email'";
     $query_staff = mysqli_query($connect, $select_staff);
 
     if (mysqli_num_rows($query_staff) > 0) {
         $data = mysqli_fetch_assoc($query_staff);
-        $hashedPassword = $data['Password'];
 
-        if (password_verify($password, $hashedPassword)) {
-            // Store Staff Session
+        if (password_verify($password, $data['Password'])) {
+
             $_SESSION['sid'] = $data['StaffID'];
             $_SESSION['sname'] = $data['Name'];
             $_SESSION['username'] = $data['UserName'];
@@ -23,57 +22,53 @@ if (isset($_POST['btnlogin'])) {
             $_SESSION['sphone'] = $data['PhoneNumber'];
             $_SESSION['position'] = $data['Position'];
             $_SESSION['role'] = "staff";
-            $_SESSION['LoginError'] = 0;
 
             echo "<script>alert('Staff Login Success'); window.location='index.php';</script>";
             exit();
         } else {
-            echo "<script>alert('Invalid Staff Password');</script>";
+            echo "<script>alert('Invalid Staff Password'); window.location='login.php';</script>";
             exit();
         }
     }
 
-    // ---- 2. Check Patient ----
+    // ---- Patient ----
     $select_patient = "SELECT * FROM patientregister WHERE Email='$email'";
     $query_patient = mysqli_query($connect, $select_patient);
 
     if (mysqli_num_rows($query_patient) > 0) {
         $data = mysqli_fetch_assoc($query_patient);
-        $hashedPassword = $data['Password'];
 
-        if (password_verify($password, $hashedPassword)) {
-            // Store Patient Session
+        if (password_verify($password, $data['Password'])) {
             $_SESSION['pid'] = $data['PatientID'];
             $_SESSION['pname'] = $data['Name'];
             $_SESSION['pemail'] = $data['Email'];
             $_SESSION['pphone'] = $data['PhoneNumber'];
             $_SESSION['role'] = "patient";
-            $_SESSION['LoginError'] = 0;
 
             echo "<script>alert('Patient Login Success'); window.location='index.php';</script>";
             exit();
         } else {
-            echo "<script>alert('Invalid Patient Password');</script>";
+            echo "<script>alert('Invalid Password'); window.location='login.php';</script>";
             exit();
         }
     }
 
-    // ---- 3. If not found ----
-    echo "<script>alert('Email not found in Staff or Patient records');</script>";
+
+    echo "<script>alert('Email not found in Staff or Patient records'); window.location='login.php';</script>";
+    exit();
 }
 ?>
-
 <?php include 'header.php'; ?>
 
 <body class="bg-[#F7EFEF] font-sans text-[#4A2C35]">
     <?php include 'navbar.php'; ?>
 
-    <!-- Page Title -->
+
     <div class="text-center py-10">
         <h1 class="text-3xl font-bold text-[#916D7A]">Login to Your Account</h1>
     </div>
 
-    <!-- Login Form -->
+
     <main class="max-w-md mx-auto bg-white p-8 rounded shadow-md border border-[#EBD5DC] mb-20">
         <form action="login.php" method="POST" class="space-y-5">
             <div>

@@ -3,12 +3,12 @@ function AddTreatment($tid, $qty)
 {
     include('connect.php');
 
-    // Sanitize inputs to avoid SQL injection (if not done elsewhere)
+
     $tid = mysqli_real_escape_string($connect, $tid);
     $qty = intval($qty);
 
     if ($qty <= 0) {
-        return; // Do not add if quantity is zero or negative
+        return;
     }
 
     $query = mysqli_query($connect, "SELECT * FROM treatment WHERE TreatmentCode='$tid'");
@@ -27,13 +27,13 @@ function AddTreatment($tid, $qty)
         $found = false;
         foreach ($_SESSION['Invoice_Function'] as &$item) {
             if ($item['TreatmentCode'] == $tid) {
-                // Increase quantity if treatment already added
+
                 $item['Quantity'] += $qty;
                 $found = true;
                 break;
             }
         }
-        unset($item); // break reference with last element
+        unset($item);
 
         if (!$found) {
             $_SESSION['Invoice_Function'][] = $data;
@@ -43,12 +43,12 @@ function AddTreatment($tid, $qty)
 
 function RemoveTreatment($tid)
 {
-    if (!isset($_SESSION['Invoice_Function'])) return; // Avoid warning if session not set
+    if (!isset($_SESSION['Invoice_Function'])) return;
 
     foreach ($_SESSION['Invoice_Function'] as $key => $item) {
         if ($item['TreatmentCode'] == $tid) {
             unset($_SESSION['Invoice_Function'][$key]);
-            // Re-index array so keys remain sequential
+
             $_SESSION['Invoice_Function'] = array_values($_SESSION['Invoice_Function']);
             break;
         }
@@ -58,7 +58,7 @@ function RemoveTreatment($tid)
 function CalculateTotalAmount()
 {
     if (!isset($_SESSION['Invoice_Function'])) {
-        return 0; // If no treatments added, total is zero
+        return 0;
     }
 
     $total = 0;

@@ -17,7 +17,7 @@ function AddProduct($PID, $qty)
         $size = $data['ProductSize'];
         $description = $data['Description'];
 
-        // Use StaffCart for staff, ShoppingCart for patients
+
         if (isset($_SESSION['sid'])) {
             if (!isset($_SESSION['StaffCart'])) {
                 $_SESSION['StaffCart'] = array();
@@ -56,12 +56,12 @@ function AddProduct($PID, $qty)
             }
         }
     }
-} // <-- properly closed AddProduct
+} 
 
 
 function RemoveProduct($PID)
 {
-    // Remove from correct cart
+    
     if (isset($_SESSION['sid'])) {
         $Index = IndexOfStaff($PID);
         unset($_SESSION['StaffCart'][$Index]);

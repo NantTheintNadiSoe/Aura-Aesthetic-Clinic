@@ -34,7 +34,7 @@ if (isset($_GET['PID'])) {
         <h1 class="text-4xl font-extrabold text-[#916D7A] mb-8 border-b border-[#EBD5DC] pb-4">Shopping Cart</h1>
 
         <?php
-        // Use correct cart for staff or patient
+        
         $cartName = isset($_SESSION['sid']) ? 'StaffCart' : 'ShoppingCart';
         if (!isset($_SESSION[$cartName]) || count($_SESSION[$cartName]) == 0): ?>
             <p class="text-center text-[#6E4B57] text-lg mt-20">Your cart is empty.</p>

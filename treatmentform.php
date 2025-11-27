@@ -81,7 +81,7 @@ if (isset($_POST['btnsubmit'])) {
         <div class="max-w-md sm:max-w-lg md:max-w-xl lg:max-w-4xl mx-auto bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-md border border-[#EBD5DC] mb-8 sm:mb-12 lg:mb-20">
             <form action="treatmentform.php" method="POST" class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-x-6 lg:gap-y-5" enctype="multipart/form-data">
 
-                <!-- Treatment Code (readonly, full width on lg+) -->
+                <!-- Treatment Code -->
                 <div class="lg:col-span-2">
                     <label class="block font-medium mb-1 text-sm sm:text-base">Treatment Code</label>
                     <input type="text" name="treatment_code"
@@ -139,29 +139,29 @@ if (isset($_POST['btnsubmit'])) {
                 <!-- Sessions -->
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">No. of Sessions</label>
-                    <input type="number" name="sessions" placeholder="e.g., 3"
+                    <input type="number" name="sessions" required placeholder="e.g., 3"
                         class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <!-- Recovery Time -->
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Recovery Time</label>
-                    <input type="text" name="recovery" placeholder="e.g., 2 days"
-                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
+                    <input type="text" required name="recovery" placeholder="e.g., 2 days"
+                        required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <!-- Duration of Effect -->
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Duration of Effect</label>
                     <input type="text" name="duration_effect" placeholder="e.g., 3 months"
-                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
+                        required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <!-- Discount -->
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Discount (%)</label>
                     <input type="number" name="discount" placeholder="e.g., 10"
-                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
+                        required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <!-- Prerequisites -->
@@ -199,7 +199,7 @@ if (isset($_POST['btnsubmit'])) {
                         class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base resize-none"></textarea>
                 </div>
 
-                <!-- Description (full width on lg+) -->
+                <!-- Description -->
                 <div class="lg:col-span-2">
                     <label class="block font-medium mb-1 text-sm sm:text-base">Description</label>
                     <textarea name="description" rows="4"
@@ -208,7 +208,7 @@ if (isset($_POST['btnsubmit'])) {
 
                 <input type="hidden" name="status" value="Active">
 
-                <!-- Submit Button (full width on lg+) -->
+                <!-- Submit Button -->
                 <div class="lg:col-span-2 text-center pt-4">
                     <button type="submit" name="btnsubmit"
                         class="px-4 sm:px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#6E4B57] transition font-semibold text-sm sm:text-base w-full">

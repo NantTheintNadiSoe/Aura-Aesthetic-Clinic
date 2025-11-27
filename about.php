@@ -156,15 +156,7 @@ include 'header.php'; ?>
         </div>
     </section>
 
-    <!-- Join Us Section -->
-    <!-- <section class="py-16 bg-[#FFF0EB]">
-        <div class="max-w-5xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-6 text-[#BA9EA8]">Join Our Team</h2>
-            <p class="mb-8 max-w-2xl mx-auto">We're always looking for talented individuals to join our growing team. Check out our current openings.</p>
-            <button class="bg-[#BA9EA8] hover:bg-[#D6A6B8] text-white font-medium py-3 px-8 rounded-full transition">View Open Positions</button>
-        </div>
-    </section> -->
-    <!-- Footer -->
+
     <?php include 'footer.php'; ?>
 </body>
 

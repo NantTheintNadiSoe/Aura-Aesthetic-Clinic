@@ -66,9 +66,7 @@ if (isset($_POST['notify'])) {
                 </div>
             <?php endif; ?>
 
-            <!-- <a href="recommendation.php" class="inline-block px-6 py-2 bg-gray-300 text-[#4A2C35] rounded hover:bg-gray-400 transition font-medium">
-                ← Back to Recommendations
-            </a> -->
+
         </div>
     </div>
 

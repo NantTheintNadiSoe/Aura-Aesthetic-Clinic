@@ -36,7 +36,7 @@ if (isset($_POST['btnsave'])) {
         $date = date('Y-m-d');
         $total_amount = CalculateTotalAmount();
         $payment = 'Unpaid';
-        $status = 'Unpaid'; // <-- Important: default status
+        $status = 'Unpaid';
 
         // Insert invoice
         $insert_invoice = "INSERT INTO invoice 
@@ -152,7 +152,7 @@ if (isset($_POST['btnsave'])) {
                     <label class="block font-medium mb-1">Treatment</label>
                     <select name="cbotreatment"
                         class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]">
-                        <option value="">Choose Treatment</option>
+                        <option value="" disabled selected>Choose Treatment</option>
                         <?php
                         $treatments = mysqli_query($connect, "SELECT * FROM treatment");
                         while ($row = mysqli_fetch_assoc($treatments)) {
@@ -161,7 +161,6 @@ if (isset($_POST['btnsave'])) {
                         ?>
                     </select>
                 </div>
-
                 <div>
                     <label class="block font-medium mb-1">Quantity</label>
                     <input type="number" name="txtquantity" min="1"

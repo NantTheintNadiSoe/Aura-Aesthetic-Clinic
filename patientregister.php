@@ -43,7 +43,7 @@ if (isset($_POST['btnsubmit'])) {
 
         $query = mysqli_query($connect, $insert);
         if ($query) {
-            echo "<script>alert('Registration successful!'); window.location='patientlogin.php';</script>";
+            echo "<script>alert('Registration successful!'); window.location='login.php';</script>";
         } else {
             echo "<script>alert('Registration failed. Please try again.'); window.location='patientregister.php';</script>";
         }
@@ -91,17 +91,17 @@ if (isset($_POST['btnsubmit'])) {
 
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Phone</label>
-                    <input type="text" name="phone" class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
+                    <input type="text" name="phone" required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Date of Birth</label>
-                    <input type="date" name="dob" class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
+                    <input type="date" name="dob" required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base" />
                 </div>
 
                 <div>
                     <label class="block font-medium mb-1 text-sm sm:text-base">Gender</label>
-                    <select name="gender" class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base">
+                    <select name="gender" required class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base">
                         <option value="" disabled selected>Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -110,7 +110,7 @@ if (isset($_POST['btnsubmit'])) {
 
                 <div class="lg:col-span-2">
                     <label class="block font-medium mb-1 text-sm sm:text-base">Address</label>
-                    <textarea name="address" rows="3" class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base resize-none"></textarea>
+                    <textarea name="address" required rows="3" class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded focus:ring-2 focus:ring-[#916D7A] focus:border-transparent text-sm sm:text-base resize-none"></textarea>
                 </div>
 
                 <div class="lg:col-span-2 text-center pt-4">
@@ -120,7 +120,7 @@ if (isset($_POST['btnsubmit'])) {
                 </div>
 
                 <div class="lg:col-span-2 text-xs sm:text-sm text-center text-gray-600 pt-2">
-                    Already have an account? <a href="patientlogin.php" class="text-[#916D7A] underline hover:text-[#6E4B57] transition">Login</a>
+                    Already have an account? <a href="login.php" class="text-[#916D7A] underline hover:text-[#6E4B57] transition">Login</a>
                 </div>
 
             </form>

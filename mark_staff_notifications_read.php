@@ -1,31 +1,50 @@
 <?php
-// make_staff_notifications_read.php
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 include('connect.php');
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['sid'])) {
+if (!isset($_SESSION['sid']) || !isset($_SESSION['position'])) {
     echo json_encode(['success' => false, 'message' => 'Not logged in as staff']);
     exit;
 }
 
+$role = $_SESSION['position'];
 $errors = [];
 
-// Update unread notifications for staff (set IsNotified = 0)
-$q1 = "UPDATE appointment SET IsNotified = 1 WHERE IsNotified = 0";
-if (!mysqli_query($connect, $q1)) $errors[] = mysqli_error($connect);
 
-$q2 = "UPDATE orders SET IsNotified = 1 WHERE IsNotified = 0";
-if (!mysqli_query($connect, $q2)) $errors[] = mysqli_error($connect);
+$tables_to_update = [];
+if ($role === 'Admin' || $role === 'Receptionist') {
+    $tables_to_update[] = ['table' => 'appointment', 'date_field' => 'AppointmentDate'];
+    $tables_to_update[] = ['table' => 'orders', 'date_field' => 'OrderDate'];
+}
 
-$q3 = "UPDATE consultation SET IsNotified = 1 WHERE IsNotified = 0";
-if (!mysqli_query($connect, $q3)) $errors[] = mysqli_error($connect);
+if ($role === 'Aesthetic Doctor') {
+    $tables_to_update[] = ['table' => 'consultation', 'date_field' => 'ConsultationDate'];
+    $tables_to_update[] = ['table' => 'skinassessment', 'date_field' => 'AssessmentDate'];
+}
 
-$q4 = "UPDATE skinassessment SET IsNotified = 1 WHERE IsNotified = 0";
-if (!mysqli_query($connect, $q4)) $errors[] = mysqli_error($connect);
+if ($role === 'Nurse') {
+    $tables_to_update[] = ['table' => 'treatment', 'date_field' => 'Date'];
+    $tables_to_update[] = ['table' => 'skinassessment', 'date_field' => 'AssessmentDate'];
+}
+
+
+foreach ($tables_to_update as $t) {
+
+
+    $q = "UPDATE {$t['table']} SET IsNotified = 1 WHERE IsNotified = 0";
+
+
+    if (!mysqli_query($connect, $q)) {
+        $errors[] = "Error updating {$t['table']}: " . mysqli_error($connect);
+    }
+}
 
 if (empty($errors)) {
     echo json_encode(['success' => true]);
 } else {
+
+    error_log("Staff Notification Read Errors: " . implode(", ", $errors));
     echo json_encode(['success' => false, 'errors' => $errors]);
 }

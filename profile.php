@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 include('connect.php');
 include 'header.php';
@@ -29,54 +28,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 
-// Fetch patient info
+
 $query = "SELECT Name, UserName, Email, PhoneNumber, DateOfBirth, Gender, Address FROM patientregister WHERE PatientID = '" . mysqli_real_escape_string($connect, $patientID) . "' LIMIT 1";
 $result = mysqli_query($connect, $query);
 $patient = mysqli_fetch_assoc($result);
 ?>
 
-<body style="background: linear-gradient(135deg, #f7efef 0%, #e3c3d3 100%); min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #4A2C35;">
+<body class="bg-gradient-to-br from-[#f7efef] to-[#e3c3d3] min-h-screen font-sans text-[#4A2C35]">
     <?php include 'navbar.php'; ?>
-    <div style="max-width: 600px; margin: 3rem auto 5rem auto; background: #fff; border-radius: 1.5rem; box-shadow: 0 8px 32px rgba(145,109,122,0.12); border: 1px solid #EBD5DC; padding: 2.5rem 2rem;">
-        <h1 style="font-size: 2.2rem; font-weight: bold; color: #916D7A; text-align: center; margin-bottom: 2rem; letter-spacing: 1px;">My Profile</h1>
-        <?php if ($updateMsg) echo $updateMsg; ?>
-        <?php if ($patient): ?>
-            <form method="POST" autocomplete="off">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                    <div>
-                        <label class="block mb-1 font-semibold" for="name">Name</label>
-                        <input type="text" id="name" name="name" value="<?= htmlspecialchars($patient['Name']) ?>" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                        <label class="block mt-4 mb-1 font-semibold" for="username">Username</label>
-                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($patient['UserName']) ?>" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                        <label class="block mt-4 mb-1 font-semibold" for="email">Email</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($patient['Email']) ?>" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                        <label class="block mt-4 mb-1 font-semibold" for="phone">Phone</label>
-                        <input type="text" id="phone" name="phone" value="<?= htmlspecialchars($patient['PhoneNumber']) ?>" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
+
+    <div class="max-w-4xl mx-auto mt-6 lg:mt-10 px-4 sm:px-6 mb-8 lg:mb-12">
+        <div class="bg-white rounded-2xl shadow-xl border border-[#EBD5DC] p-6 lg:p-8">
+            <h1 class="text-2xl lg:text-3xl font-bold text-[#916D7A] text-center mb-6 lg:mb-8 tracking-wide">My Profile</h1>
+
+            <?php if ($updateMsg) echo $updateMsg; ?>
+
+            <?php if ($patient): ?>
+                <form method="POST" autocomplete="off">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                        <!-- Left Column -->
+                        <div class="space-y-4 lg:space-y-6">
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="name">Name</label>
+                                <input type="text" id="name" name="name" value="<?= htmlspecialchars($patient['Name']) ?>"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="username">Username</label>
+                                <input type="text" id="username" name="username" value="<?= htmlspecialchars($patient['UserName']) ?>"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="email">Email</label>
+                                <input type="email" id="email" name="email" value="<?= htmlspecialchars($patient['Email']) ?>"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone" value="<?= htmlspecialchars($patient['PhoneNumber']) ?>"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-4 lg:space-y-6">
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="dob">Date of Birth</label>
+                                <input type="date" id="dob" name="dob" value="<?= htmlspecialchars($patient['DateOfBirth']) ?>"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="gender">Gender</label>
+                                <select id="gender" name="gender"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all" required>
+                                    <option value="Male" <?= $patient['Gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
+                                    <option value="Female" <?= $patient['Gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
+                                    <option value="Other" <?= $patient['Gender'] == 'Other' ? 'selected' : '' ?>>Other</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block mb-2 font-semibold text-[#916D7A]" for="address">Address</label>
+                                <textarea id="address" name="address" rows="3"
+                                    class="w-full px-4 py-3 rounded-lg border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A] focus:border-transparent transition-all resize-none" required><?= htmlspecialchars($patient['Address']) ?></textarea>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block mb-1 font-semibold" for="dob">Date of Birth</label>
-                        <input type="date" id="dob" name="dob" value="<?= htmlspecialchars($patient['DateOfBirth']) ?>" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                        <label class="block mt-4 mb-1 font-semibold" for="gender">Gender</label>
-                        <select id="gender" name="gender" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                            <option value="Male" <?= $patient['Gender'] == 'Male' ? 'selected' : '' ?>>Male</option>
-                            <option value="Female" <?= $patient['Gender'] == 'Female' ? 'selected' : '' ?>>Female</option>
-                            <option value="Other" <?= $patient['Gender'] == 'Other' ? 'selected' : '' ?>>Other</option>
-                        </select>
-                        <label class="block mt-4 mb-1 font-semibold" for="address">Address</label>
-                        <textarea id="address" name="address" rows="3" class="w-full px-3 py-2 rounded border border-[#EBD5DC] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required><?= htmlspecialchars($patient['Address']) ?></textarea>
+
+                    <!-- Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 lg:mt-10">
+                        <button type="submit" name="update_profile"
+                            class="px-8 py-3 bg-[#916D7A] text-white rounded-lg shadow-lg hover:bg-[#7e5a68] hover:shadow-xl transition-all duration-300 font-semibold text-lg w-full sm:w-auto text-center">
+                            Update Profile
+                        </button>
+                        <a href="patientdashboard.php"
+                            class="px-6 py-3 bg-[#916D7A] text-white rounded-lg hover:bg-[#7e5a68] transition-all duration-300 font-semibold w-full sm:w-auto text-center">
+                            Back to Dashboard
+                        </a>
                     </div>
-                </div>
-                <div style="text-align: center; margin-top: 2.5rem;">
-                    <button type="submit" name="update_profile" class="px-8 py-2 bg-[#916D7A] text-white rounded-lg shadow hover:bg-[#7e5a68] transition font-semibold text-lg">Update Profile</button>
-                </div>
-            </form>
-            <div style="text-align: center; margin-top: 2rem;">
-                <a href="patientdashboard.php" class="inline-block px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#7e5a68] transition font-semibold">Back to Dashboard</a>
-            </div>
-        <?php else: ?>
-            <p style="text-align: center; color: #e53e3e;">Profile not found.</p>
-        <?php endif; ?>
+                </form>
+            <?php else: ?>
+                <p class="text-center text-red-600 text-lg">Profile not found.</p>
+            <?php endif; ?>
+        </div>
     </div>
+
     <?php include 'footer.php'; ?>
 </body>
 

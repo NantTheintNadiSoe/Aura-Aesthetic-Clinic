@@ -9,7 +9,7 @@ if (!isset($_GET['invoice'])) {
 
 $invoiceCode = mysqli_real_escape_string($connect, $_GET['invoice']);
 
-// Fetch invoice (only unpaid)
+
 $query = mysqli_query($connect, "
     SELECT i.*, p.Name, p.Email, p.PhoneNumber, i.AppointmentCode
     FROM invoice i
@@ -78,9 +78,8 @@ if (isset($_POST['btnsubmit'])) {
 
         <p class="mb-4 text-[#4A2C35]">Amount: <strong><?= number_format($invoice['TotalAmount'], 2) ?> MMK</strong></p>
 
-        <!-- Payment Form -->
         <form method="post" enctype="multipart/form-data" class="space-y-6">
-            <!-- Hidden fields -->
+
             <input type="hidden" name="invoice_code" value="<?= htmlspecialchars($invoiceCode) ?>">
             <input type="hidden" name="appointment_code" value="<?= htmlspecialchars($invoice['AppointmentCode']) ?>">
 

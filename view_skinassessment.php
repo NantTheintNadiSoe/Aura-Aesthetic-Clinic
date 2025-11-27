@@ -5,10 +5,13 @@ if (!isset($_SESSION['sid']) || !isset($_SESSION['position'])) {
     echo "<script>alert('Access denied! Please log in as staff.'); window.location='login.php';</script>";
     exit();
 }
+$role = $_SESSION['position'];
+
 if (!isset($_GET['code'])) {
     echo "<script>alert('No assessment selected.'); window.location='skinassessmentlist.php';</script>";
     exit();
 }
+
 $code = mysqli_real_escape_string($connect, $_GET['code']);
 $query = mysqli_query($connect, "SELECT sa.*, p.Name AS PatientName, p.DateofBirth, p.Gender FROM skinassessment sa LEFT JOIN patientregister p ON sa.PatientID = p.PatientID WHERE sa.AssessmentCode='$code'");
 if (!$query || mysqli_num_rows($query) == 0) {
@@ -16,6 +19,7 @@ if (!$query || mysqli_num_rows($query) == 0) {
     exit();
 }
 $a = mysqli_fetch_assoc($query);
+
 include('header.php');
 include('navbar.php');
 ?>
@@ -31,7 +35,16 @@ include('navbar.php');
         <div class="mb-4"><span class="font-semibold">Skin Condition:</span> <?= htmlspecialchars($a['SkinCondition']) ?></div>
         <div class="mb-4"><span class="font-semibold">Status:</span> <?= htmlspecialchars($a['Status']) ?></div>
         <div class="mt-8 flex justify-end">
-            <a href="recommendation.php?assessment=<?= urlencode($a['AssessmentCode']) ?>" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 font-semibold">Write Recommendation</a>
+            <?php if ($role === 'Aesthetic Doctor'): ?>
+
+                <a href="recommendation.php?assessment=<?= urlencode($a['AssessmentCode']) ?>"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 font-semibold">Write Recommendation</a>
+            <?php else: ?>
+
+                <button class="bg-gray-400 text-white px-4 py-2 rounded font-semibold"
+                    onclick="alert('Access denied! Only Aesthetic Doctor can write recommendations.')"
+                    disabled>Write Recommendation</button>
+            <?php endif; ?>
         </div>
     </div>
 </body>

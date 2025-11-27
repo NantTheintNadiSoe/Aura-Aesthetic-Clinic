@@ -174,7 +174,7 @@ include 'header.php'; ?>
             <div>
                 <?php
                 $query = "SELECT * FROM staffregister 
-                      WHERE Position IN ('Aesthetic Doctor', 'Dermatologist', 'Aesthetician')";
+                      WHERE Position IN ('Aesthetic Doctor')";
                 $result = mysqli_query($connect, $query);
                 $count = mysqli_num_rows($result);
 
