@@ -5,10 +5,10 @@
     <?php include 'navbar.php'; ?>
 
     <main class="px-6 py-12 max-w-7xl mx-auto">
-        <!-- Title -->
+
         <h1 class="text-3xl font-bold text-center text-[#916D7A] mb-10">Personalized Recommendations</h1>
 
-        <!-- Patient Info -->
+
         <div class="bg-white border border-[#EBD5DC] p-6 rounded shadow mb-12">
             <h2 class="text-xl font-semibold text-[#916D7A] mb-4">Patient Information</h2>
             <p><strong>Name:</strong> Anna</p>

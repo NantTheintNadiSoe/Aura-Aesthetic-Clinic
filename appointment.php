@@ -3,10 +3,9 @@ session_start();
 include('connect.php');
 include('AutoIDFunction.php');
 
-// Only allow access if patient is logged in
-if (!isset($_SESSION['pid'])) {
-    echo "<script>alert('Access denied! Please login first.');</script>";
-    echo "<script>window.location='login.php';</script>";
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
+    echo "<script>window.alert('Cannot Access Data Please Login!')</script>";
+    echo "<script>window.location='login.php'</script>";
     exit();
 }
 
@@ -137,7 +136,7 @@ if (isset($_POST['btnsubmit'])) {
                     <input type="text" name="name" placeholder="Name" class="w-full px-4 py-2 border rounded" required>
                     <input type="email" name="email" placeholder="Email" class="w-full px-4 py-2 border rounded" required>
                     <input type="tel" name="phone" placeholder="Phone Number" class="w-full px-4 py-2 border rounded" required>
-                    <textarea name="address" placeholder="Address" rows="3" class="w-full px-4 py-2 border rounded"></textarea>
+                    <textarea name="address" placeholder="Address" rows="3" class="w-full px-4 py-2 border rounded" required></textarea>
                 </div>
                 <div class="flex justify-between mt-6">
                     <button type="button" onclick="prevStep(2)" class="border px-6 py-2 rounded hover:bg-gray-100">Back</button>
@@ -251,7 +250,7 @@ if (isset($_POST['btnsubmit'])) {
             if (!selectedDate) return;
 
             const dateString = formatDate(selectedDate);
-            const timeOptions = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM'];
+            const timeOptions = ['9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM'];
             let html = '';
 
             timeOptions.forEach(time => {

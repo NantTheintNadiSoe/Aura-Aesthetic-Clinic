@@ -24,7 +24,7 @@ include('connect.php');
                 class="px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#6E4B57] transition">Search</button>
         </form>
     </section>
-    <!-- Category Filter Buttons (5 per row, compact width) -->
+   
     <section class="max-w-7xl mx-auto mt-10 px-4 mb-16">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-4">
             <?php

@@ -92,22 +92,7 @@ include 'header.php';
         </div>
     </header>
 
-    <!-- FAQ Content -->
-    <!-- <main class="container mx-auto px-6 py-16">
-        <div class="max-w-4xl mx-auto"> -->
-    <!-- Featured Questions -->
-    <!-- <div class="grid md:grid-cols-2 gap-6 mb-16">
-                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition">
-                    <i class='bx bx-calendar text-4xl text-[#BA9EA8] mb-4'></i>
-                    <h3 class="text-xl font-semibold mb-2">Appointment Scheduling</h3>
-                    <p class="text-[#7A4E5E]">Learn how to book, reschedule or cancel your appointments</p>
-                </div>
-                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition">
-                    <i class='bx bx-dollar-circle text-4xl text-[#BA9EA8] mb-4'></i>
-                    <h3 class="text-xl font-semibold mb-2">Payment & Insurance</h3>
-                    <p class="text-[#7A4E5E]">Information about pricing, packages and payment options</p>
-                </div>
-            </div> -->
+    
 
     <!-- FAQ Accordion -->
     <div class="mb-16">

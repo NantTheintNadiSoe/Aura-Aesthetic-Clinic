@@ -2,13 +2,13 @@
 session_start();
 include('connect.php');
 
-// Ensure staff is logged in
+
 if (!isset($_SESSION['sid'])) {
     echo "<script>alert('Access denied! Please log in.'); window.location='stafflogin.php';</script>";
     exit();
 }
 
-// Check if invoice code is provided
+
 if (!isset($_GET['code'])) {
     echo "<script>alert('Invoice code not found.'); window.location='ViewInvoice.php';</script>";
     exit();

@@ -6,7 +6,7 @@
                 <p>Innovating for a better future since 2015.</p>
                 <p>Phone: +123 456 7890</p>
                 <p>Email: info@auraclinic.com</p>
-                <p>Address: 123 Skin St, Wellness City</p>
+                <p>Address: 123 Lanmadaw Township, Yangon</p>
             </div>
             <div>
                 <h4 class="font-semibold mb-4">Quick Links</h4>

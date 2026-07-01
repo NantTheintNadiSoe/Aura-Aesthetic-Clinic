@@ -9,7 +9,7 @@ if (!isset($_GET['invoice'])) {
 
 $invoiceCode = mysqli_real_escape_string($connect, $_GET['invoice']);
 
-// Fetch invoice (only unpaid)
+
 $query = mysqli_query($connect, "
     SELECT i.*, p.Name, p.Email, p.PhoneNumber, i.AppointmentCode
     FROM invoice i
@@ -78,9 +78,8 @@ if (isset($_POST['btnsubmit'])) {
 
         <p class="mb-4 text-[#4A2C35]">Amount: <strong><?= number_format($invoice['TotalAmount'], 2) ?> MMK</strong></p>
 
-        <!-- Payment Form -->
         <form method="post" enctype="multipart/form-data" class="space-y-6">
-            <!-- Hidden fields -->
+
             <input type="hidden" name="invoice_code" value="<?= htmlspecialchars($invoiceCode) ?>">
             <input type="hidden" name="appointment_code" value="<?= htmlspecialchars($invoice['AppointmentCode']) ?>">
 
@@ -92,11 +91,12 @@ if (isset($_POST['btnsubmit'])) {
             <div>
                 <label class="block mb-2 font-semibold">Payment Method</label>
                 <select name="payment_method" class="border border-[#EBD5DC] rounded w-full px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
-                    <option value="">Select</option>
-                    <option value="Cash">Cash</option>
+                    <option value="">Select PaymentMethod</option>
                     <option value="Kpay">Kpay</option>
                     <option value="Wavepay">Wavepay</option>
                     <option value="Aya Pay">Aya Pay</option>
+                    <option value="AYA Bank">AYA Bank</option>
+                    <option value="KBZ Bank">KBZ Bank</option>
                 </select>
             </div>
 
@@ -108,6 +108,22 @@ if (isset($_POST['btnsubmit'])) {
             <button type="submit" name="btnsubmit" class="bg-[#916D7A] hover:bg-[#6E4B57] text-white px-4 py-2 rounded shadow w-full transition">
                 Submit Payment
             </button>
+            <!-- Bank and Mobile Wallet Information -->
+            <div class="mt-6 bg-[#FAF2F5] p-4 rounded-lg border border-[#EBD5DC] text-[#4A2C35]">
+                <h3 class="font-bold text-[#916D7A] mb-2">Payment Information – Aura Aesthetic Clinic</h3>
+                <p class="mb-2"><strong>Mobile Wallets:</strong></p>
+                <ul class="mb-2 list-disc list-inside">
+                    <li>KPay: 09 123 456 789</li>
+                    <li>Wave Pay: 09 987 654 321</li>
+                    <li>Aya Pay: 09 555 888 999</li>
+                </ul>
+                <p class="mb-2"><strong>Bank Accounts:</strong></p>
+                <ul class="list-disc list-inside">
+                    <li>AYA Bank (Aura Aesthetic Clinic): 123-456-7890</li>
+                    <li>KBZ Bank (Aura Aesthetic Clinic): 987-654-3210</li>
+                </ul>
+                <p class="mt-2 text-sm text-[#6E4B57]">After transferring the payment, please upload a screenshot of your payment to confirm your order.</p>
+            </div>
         </form>
     </div>
 

@@ -12,7 +12,7 @@ if (!isset($_SESSION['sid']) || !in_array($_SESSION['position'], ['Admin', 'Derm
 
 $recommendationCode = AutoID("recommendation", "RecommendationCode", "R_", 6);
 
-// Handle form submission
+
 if (isset($_POST['btnsubmit'])) {
     $assessmentCode = $_POST['assessmentcode'];
     $staffID = $_SESSION['sid'];
@@ -53,7 +53,7 @@ if (isset($_POST['btnsubmit'])) {
     <?php include 'navbar.php'; ?>
 
     <div class="max-w-3xl mx-auto mt-10 p-6 mb-20 bg-white rounded shadow border border-[#EBD5DC]">
-        <h2 class="text-2xl font-bold text-[#916D7A] mb-6 text-center">Write Recommendation</h2>
+        <h2 class="text-2xl font-bold text-[#916D7A] mb-6 text-center">Recommendation</h2>
 
         <form action="recommendation.php" method="POST">
             <div class="mb-4">
@@ -64,7 +64,7 @@ if (isset($_POST['btnsubmit'])) {
             <div class="mb-4">
                 <label class="font-medium block mb-1">Assessment Code</label>
                 <select name="assessmentcode" required class="w-full px-4 py-2 border border-[#EBD5DC] rounded">
-                    <option>Select Assessment Code</option>
+                    <option value="" disabled selected>Select Assessment Code</option>
                     <?php
                     $select = "SELECT * FROM skinassessment WHERE AssessmentCode NOT IN (SELECT AssessmentCode FROM recommendation)";
                     $query = mysqli_query($connect, $select);
@@ -112,26 +112,32 @@ if (isset($_POST['btnsubmit'])) {
             </div>
 
             <div class="mb-4">
-                <label class="font-medium block mb-1">Recommended Treatments <span class="text-sm text-gray-500">(optional)</span></label>
-                <div class="grid grid-cols-2 gap-2 text-sm">
+                <label class="font-medium block mb-1">
+                    Recommended Treatments <span class="text-sm text-gray-500">(required)</span>
+                </label>
+                <div id="treatmentsContainer" class="grid grid-cols-2 gap-2 text-sm">
                     <?php
                     $treatmentQuery = mysqli_query($connect, "SELECT TreatmentName FROM treatment ORDER BY TreatmentName ASC");
                     while ($row = mysqli_fetch_assoc($treatmentQuery)) {
                         $treatmentName = $row['TreatmentName'];
-                        echo "<label class='flex items-center'><input type='checkbox' name='recommended_treatments[]' value='$treatmentName' class='mr-2'>$treatmentName</label>";
+                        echo "<label class='flex items-center'>
+                    <input type='checkbox' name='recommended_treatments[]' value='$treatmentName' class='mr-2 treatment-checkbox'>
+                    $treatmentName
+                  </label>";
                     }
                     ?>
                 </div>
+                <p id="treatmentError" class="text-red-500 text-sm mt-1 hidden">Please select at least one treatment.</p>
             </div>
 
             <div class="mb-4">
                 <label class="font-medium block mb-1">Skincare Products or Ingredients <span class="text-sm text-gray-500">(optional)</span></label>
-                <textarea name="products" rows="2" class="w-full px-4 py-2 border border-[#EBD5DC] rounded"></textarea>
+                <textarea name="products" required rows="2" class="w-full px-4 py-2 border border-[#EBD5DC] rounded"></textarea>
             </div>
 
             <div class="mb-4">
                 <label class="font-medium block mb-1">Lifestyle Advice</label>
-                <textarea name="advice" rows="2" class="w-full px-4 py-2 border border-[#EBD5DC] rounded"></textarea>
+                <textarea required name="advice" rows="2" class="w-full px-4 py-2 border border-[#EBD5DC] rounded"></textarea>
             </div>
 
             <div class="mb-4">

@@ -164,7 +164,7 @@ if (isset($_POST['btnsubmit'])) {
 
                         <div>
                             <label class="block font-semibold text-lg mb-2">Subject</label>
-                            <select name="subject" class="w-full px-5 py-4 border border-gray-200 rounded-xl form-input focus:outline-none">
+                            <select name="subject" class="w-full px-5 py-4 border border-gray-200 rounded-xl form-input focus:outline-none" required>
                                 <option disabled selected>Select a subject</option>
                                 <option>Appointment Booking</option>
                                 <option>General Inquiry</option>

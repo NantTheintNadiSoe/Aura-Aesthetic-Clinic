@@ -59,7 +59,7 @@ $data = mysqli_fetch_assoc($result);
                         class="w-20 border border-[#EBD5DC] rounded-lg px-3 py-2 text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
                     <button type="submit" name="btnadd"
                         class="px-8 py-3 bg-[#916D7A] text-white rounded-lg hover:bg-[#6E4B57] transition font-semibold shadow-md">Add to Cart</button>
-                    <a href="product.php"
+                    <a href="productview.php"
                         class="px-8 py-3 bg-[#EBD5DC] text-[#6E4B57] rounded-lg hover:bg-[#D4B9C0] transition font-semibold shadow-md">Back to Products</a>
                 </form>
             </div>

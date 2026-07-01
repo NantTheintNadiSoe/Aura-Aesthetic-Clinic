@@ -1,49 +1,67 @@
 <?php
 session_start();
 include('connect.php');
-include('ShoppingCartFunction.php');
+include('ShoppingCartFunction.php'); // include cart functions
 include('AutoIDFunction.php');
 
+// Check if user is logged in (patient or staff)
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
+    echo "<script>alert('Please login first!'); window.location='login.php';</script>";
+    exit();
+}
+
+
+$cartName = isset($_SESSION['sid']) ? 'StaffCart' : 'ShoppingCart';
+
 // Redirect if cart is empty
-if (!isset($_SESSION['ShoppingCart']) || count($_SESSION['ShoppingCart']) == 0) {
+if (!isset($_SESSION[$cartName]) || count($_SESSION[$cartName]) == 0) {
     echo "<script>alert('Your cart is empty!'); window.location='productview.php';</script>";
     exit();
 }
 
-// Generate hidden OrderCode
+
 $orderCode = AutoID("orders", "OrderCode", "Ord_", 6);
 
 // Handle order submission
 if (isset($_POST['btnPlaceOrder'])) {
-    $patientID = $_SESSION['pid'];
-    $orderCode = mysqli_real_escape_string($connect, $_POST['order_code']);
+    $userID = isset($_SESSION['pid']) ? $_SESSION['pid'] : $_SESSION['sid'];
+    $orderCodeInput = mysqli_real_escape_string($connect, $_POST['order_code']);
     $Name = mysqli_real_escape_string($connect, $_POST['Name']);
     $email = mysqli_real_escape_string($connect, $_POST['email']);
     $phone = mysqli_real_escape_string($connect, $_POST['phone']);
     $address = mysqli_real_escape_string($connect, $_POST['address']);
-    $paymentMethod = mysqli_real_escape_string($connect, $_POST['paymentMethod'] ?? 'Cash'); // default payment
+    $paymentMethod = mysqli_real_escape_string($connect, $_POST['paymentMethod']);
+
+    // Handle payment screenshot upload
+    $paymentImage = '';
+    if (isset($_FILES['payment_screenshot']) && $_FILES['payment_screenshot']['error'] == 0) {
+        $fileExt = pathinfo($_FILES['payment_screenshot']['name'], PATHINFO_EXTENSION);
+        $paymentImage = uniqid("pay_") . "." . $fileExt;
+        $uploadDir = "uploads/payments/";
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+        if (!move_uploaded_file($_FILES['payment_screenshot']['tmp_name'], $uploadDir . $paymentImage)) {
+            echo "<script>alert('Failed to upload payment screenshot.'); window.history.back();</script>";
+            exit();
+        }
+        $paymentImage = $uploadDir . $paymentImage;
+    } else {
+        echo "<script>alert('Please upload payment screenshot.'); window.history.back();</script>";
+        exit();
+    }
 
     $totalQty = CalculateTotalQuantity();
-    $grandTotal = 0;
-
-    // Calculate total amount
-    foreach ($_SESSION['ShoppingCart'] as $item) {
-        $price = $item['Price'];
-        $discount = $item['Discount'];
-        $discountedPrice = $price - ($price * $discount / 100);
-        $grandTotal += $discountedPrice * $item['Quantity'];
-    }
+    $grandTotal = CalculateTotalAmount();
 
     // Insert into orders table
     $orderQuery = "INSERT INTO orders 
-        (OrderCode, PatientID, Name, Email, Phone, DeliveryAddress, TotalQuantity, TotalAmount, OrderDate, PaymentMethod, Status)
+        (OrderCode, PatientID, Name, Email, Phone, DeliveryAddress, TotalQuantity, TotalAmount, OrderDate, PaymentMethod, PaymentImage, Status)
         VALUES
-        ('$orderCode', '$patientID', '$Name', '$email', '$phone', '$address', $totalQty, $grandTotal, NOW(), '$paymentMethod', 'Pending')";
+        ('$orderCodeInput', '$userID', '$Name', '$email', '$phone', '$address', $totalQty, $grandTotal, NOW(), '$paymentMethod', '$paymentImage', 'Pending')";
     mysqli_query($connect, $orderQuery);
-    $orderCode = mysqli_insert_id($connect);
+    $orderID = mysqli_insert_id($connect);
 
     // Insert order details
-    foreach ($_SESSION['ShoppingCart'] as $item) {
+    foreach ($_SESSION[$cartName] as $item) {
         $pid = $item['ProductCode'];
         $qty = $item['Quantity'];
         $price = $item['Price'];
@@ -51,12 +69,12 @@ if (isset($_POST['btnPlaceOrder'])) {
         $discountedPrice = $price - ($price * $discount / 100);
 
         $detailQuery = "INSERT INTO order_details (OrderCode, ProductCode, Quantity, Price)
-                        VALUES ($orderCode, '$pid', $qty, $discountedPrice)";
+                        VALUES ('$orderCodeInput', '$pid', $qty, $discountedPrice)";
         mysqli_query($connect, $detailQuery);
     }
 
     // Clear cart
-    unset($_SESSION['ShoppingCart']);
+    unset($_SESSION[$cartName]);
 
     echo "<script>alert('Your order has been placed successfully!'); window.location='productview.php';</script>";
     exit();
@@ -88,7 +106,7 @@ if (isset($_POST['btnPlaceOrder'])) {
                 <tbody>
                     <?php
                     $grandTotal = 0;
-                    foreach ($_SESSION['ShoppingCart'] as $item):
+                    foreach ($_SESSION[$cartName] as $item):
                         $discountedPrice = $item['Price'] - ($item['Price'] * $item['Discount'] / 100);
                         $total = $discountedPrice * $item['Quantity'];
                         $grandTotal += $total;
@@ -109,7 +127,7 @@ if (isset($_POST['btnPlaceOrder'])) {
             </table>
         </div>
 
-        <!-- Summary -->
+
         <div class="bg-white p-6 rounded-lg shadow-md border border-[#EBD5DC] w-full mb-10">
             <p class="text-lg font-semibold text-[#4A2C35] mb-2">
                 Total Quantity: <span class="font-mono"><?php echo CalculateTotalQuantity(); ?></span>
@@ -120,27 +138,45 @@ if (isset($_POST['btnPlaceOrder'])) {
         </div>
 
         <!-- Customer Info Form -->
-        <form method="POST" action="checkout.php" class="bg-white p-8 rounded-xl shadow-lg border border-[#EBD5DC] w-full">
-            <input type="hidden" name="order_code" value="<?php echo $orderCode; ?>" /> <!-- Hidden OrderCode -->
+        <form method="POST" action="checkout.php" enctype="multipart/form-data" class="bg-white p-8 rounded-xl shadow-lg border border-[#EBD5DC] w-full">
+            <input type="hidden" name="order_code" value="<?php echo $orderCode; ?>" />
 
             <h2 class="text-3xl font-semibold text-[#916D7A] mb-6 text-center">Customer Information</h2>
             <div class="flex flex-col gap-5">
-                <input type="text" name="Name" placeholder="Full Name" required
-                    class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-                <input type="email" name="email" placeholder="Email" required
-                    class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-                <input type="text" name="phone" placeholder="Phone Number" required
-                    class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-                <textarea name="address" placeholder="Delivery Address" required rows="4"
-                    class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A] resize-none"></textarea>
-                <select name="paymentMethod" class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]">
-                    <option value="Cash">Cash</option>
-                    <option value="Card">Card</option>
+                <input type="text" name="Name" placeholder="Full Name" required class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
+                <input type="email" name="email" placeholder="Email" required class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
+                <input type="text" name="phone" placeholder="Phone Number" required class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
+                <textarea name="address" placeholder="Delivery Address" required rows="4" class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A] resize-none"></textarea>
+
+                <select name="paymentMethod" class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="KPay">KPay</option>
+                    <option value="WavePay">WavePay</option>
+                    <option value="Aya Pay">Aya Pay</option>
+                    <option value="AYA Bank">AYA Bank</option>
+                    <option value="KBZ Bank">KBZ Bank</option>
                 </select>
-                <button type="submit" name="btnPlaceOrder"
-                    class="bg-[#916D7A] text-white py-3 rounded-lg hover:bg-[#6E4B57] transition font-semibold shadow-md">
-                    Place Order
-                </button>
+
+                <label class="block mb-2 font-semibold">Upload Payment Screenshot</label>
+                <input type="file" name="payment_screenshot" accept="image/*" required class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
+
+                <button type="submit" name="btnPlaceOrder" class="bg-[#916D7A] text-white py-3 rounded-lg hover:bg-[#6E4B57] transition font-semibold shadow-md">Place Order</button>
+            </div>
+            <!-- Bank and Mobile Wallet Information -->
+            <div class="mt-6 bg-[#FAF2F5] p-4 rounded-lg border border-[#EBD5DC] text-[#4A2C35]">
+                <h3 class="font-bold text-[#916D7A] mb-2">Payment Information – Aura Aesthetic Clinic</h3>
+                <p class="mb-2"><strong>Mobile Wallets:</strong></p>
+                <ul class="mb-2 list-disc list-inside">
+                    <li>KPay: 09 123 456 789</li>
+                    <li>Wave Pay: 09 987 654 321</li>
+                    <li>Aya Pay: 09 555 888 999</li>
+                </ul>
+                <p class="mb-2"><strong>Bank Accounts:</strong></p>
+                <ul class="list-disc list-inside">
+                    <li>AYA Bank (Aura Aesthetic Clinic): 123-456-7890</li>
+                    <li>KBZ Bank (Aura Aesthetic Clinic): 987-654-3210</li>
+                </ul>
+                <p class="mt-2 text-sm text-[#6E4B57]">After transferring the payment, please upload a screenshot of your payment to confirm your order.</p>
             </div>
         </form>
     </section>

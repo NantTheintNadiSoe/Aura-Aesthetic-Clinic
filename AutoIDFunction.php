@@ -15,9 +15,9 @@ function AutoID($tableName, $fieldName, $prefix, $noOfLeadingZeros)
     if ($noOfRow < 1) {
         return $prefix . "000001";
     } else {
-        $oldID = $row[$fieldName];    //Reading Last ID //Pur_000001
-        $oldID = str_replace($prefix, "", $oldID);    //Removing "Prefix" 000001
-        $value = (int)$oldID;    //Convert to Integer
+        $oldID = $row[$fieldName];    
+        $oldID = str_replace($prefix, "", $oldID);   
+        $value = (int)$oldID;    
         $value++;    //Increment		
         $newID = $prefix . NumberFormatter($value, $noOfLeadingZeros);
         return $newID;

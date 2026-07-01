@@ -3,7 +3,7 @@ session_start();
 include('connect.php');
 include('AutoIDFunction.php');
 
-if (!isset($_SESSION['pid'])) {
+if (!isset($_SESSION['pid']) && !isset($_SESSION['sid'])) {
     echo "<script>window.alert('Cannot Access Data Please Login!')</script>";
     echo "<script>window.location='login.php'</script>";
     exit();
@@ -60,97 +60,121 @@ if (isset($_POST['btnsubmit'])) {
     <?php include 'navbar.php'; ?>
 
     <!-- Page Title -->
-    <div class="text-center py-10">
-        <h1 class="text-3xl font-bold text-[#916D7A]">Online Skin Assessment</h1>
+    <div class="text-center py-8 sm:py-10 px-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#916D7A]">Online Skin Assessment</h1>
     </div>
 
-
     <!-- Form Container -->
-    <div class="max-w-xl mx-auto bg-white p-8 rounded shadow-md border border-[#EBD5DC] mb-20">
-        <form action="skinassessment.php?code=<?php echo $assessmentCode; ?>" method="POST" enctype="multipart/form-data">
+    <div class="max-w-4xl mx-auto bg-white p-4 sm:p-8 rounded-lg shadow-md border border-[#EBD5DC] mb-10 sm:mb-20">
+        <form action="skinassessment.php?code=<?php echo $assessmentCode; ?>" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <input type="hidden" name="AssessmentCode" value="<?php echo $assessmentCode; ?>">
 
+            <!-- Left Column: Personal Information -->
+            <div class="space-y-4 lg:space-y-6">
+                <!-- Name -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Name</label>
+                    <input type="text" name="name"
+                        value="<?php
+                                if (isset($_SESSION['pid'])) {
+                                    echo $_SESSION['pname'];
+                                } else {
+                                    echo ''; // 
+                                }
+                                ?>"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required />
+                </div>
 
+                <!-- Email -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Email</label>
+                    <input type="email" name="email"
+                        value="<?php
+                                if (isset($_SESSION['pid'])) {
+                                    echo $_SESSION['pemail'];
+                                } else {
+                                    echo '';
+                                }
+                                ?>"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required />
+                </div>
 
-            <!-- Name -->
-            <div>
-                <label class="block font-medium mb-1">Name</label>
-                <input type="text" name="name" value="<?php echo $_SESSION['pname']; ?>"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required />
+                <!-- Phone -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Phone Number</label>
+                    <input type="text" name="phone"
+                        value="<?php
+                                if (isset($_SESSION['pid'])) {
+                                    echo $_SESSION['pphone'];
+                                } else {
+                                    echo '';
+                                }
+                                ?>"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required />
+                </div>
+
+                <!-- Date Of Birth -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Date Of Birth</label>
+                    <input type="date" name="dob"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required />
+                </div>
+
+                <!-- Gender -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Gender</label>
+                    <select name="gender"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required>
+                        <option value="" disabled selected>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Email -->
-            <div>
-                <label class="block font-medium mb-1">Email</label>
-                <input type="email" name="email" value="<?php echo $_SESSION['pemail']; ?>"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required />
+        
+            <div class="space-y-4 lg:space-y-6">
+                <!-- Assessment Date -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Assessment Date</label>
+                    <input type="date" name="assessment_date" value="<?php echo date('Y-m-d'); ?>"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base"
+                        required />
+                </div>
+
+                <!-- Allergies -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Allergies</label>
+                    <input type="text" name="allergies"
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base" />
+                </div>
+
+                <!-- Skincare Routine -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Skincare Routine</label>
+                    <input type="text" name="routine" required
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base" />
+                </div>
+
+                <!-- Skincare Cost -->
+                <div>
+                    <label class="block font-medium mb-1 text-sm sm:text-base">Spend Skincare Costs (MMK)</label>
+                    <input type="text" name="costs" required
+                        class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base" />
+                </div>
             </div>
 
-            <!-- Phone -->
-            <div>
-                <label class="block font-medium mb-1">Phone Number</label>
-                <input type="text" name="phone" value="<?php echo $_SESSION['pphone']; ?>"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required />
-            </div>
-
-            <!-- Date Of Birth -->
-            <div>
-                <label class="block font-medium mb-1">Date Of Birth</label>
-                <input type="date" name="dob"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required />
-            </div>
-
-            <!-- Gender -->
-            <div>
-                <label class="block font-medium mb-1">Gender</label>
-                <select name="gender"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required>
-                    <option value="" disabled selected>Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-
-            <!-- Assessment Date -->
-            <div>
-                <label class="block font-medium mb-1">Assessment Date</label>
-                <input type="date" name="assessment_date" value="<?php echo date('Y-m-d'); ?>"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
-                    required />
-            </div>
-
-
-            <!-- Allergies -->
-            <div>
-                <label class="block font-medium mb-1">Allergies</label>
-                <input type="text" name="allergies"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-            </div>
-
-            <!-- Skincare Routine -->
-            <div>
-                <label class="block font-medium mb-1">Skincare Routine</label>
-                <input type="text" name="routine"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-            </div>
-
-            <!-- Skincare Cost -->
-            <div>
-                <label class="block font-medium mb-1">Spend Skincare Costs (MMK)</label>
-                <input type="text" name="costs"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
-            </div>
-
+         
             <!-- Skin Concerns -->
-            <div>
-                <label class="block font-medium mb-1">Skin Concern</label>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            <div class="lg:col-span-2">
+                <label class="block font-medium mb-1 text-sm sm:text-base">Skin Concern</label>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm" required>
                     <?php
                     $concerns = ['Rough Skin', 'Oiliness', 'Dryness', 'Sun damage', 'Dark eye circles', 'Redness', 'Acne', 'Wrinkles', 'Dehydration', 'Other'];
                     foreach ($concerns as $c) {
@@ -161,30 +185,29 @@ if (isset($_POST['btnsubmit'])) {
             </div>
 
             <!-- Skin Condition -->
-            <div>
-                <label class="block font-medium mb-1">Skin Condition</label>
+            <div class="lg:col-span-2">
+                <label class="block font-medium mb-1 text-sm sm:text-base">Skin Condition</label>
                 <textarea name="condition" rows="4"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]"
+                    class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base resize-vertical"
                     required></textarea>
             </div>
 
             <!-- Skin Photo -->
-            <div>
-                <label class="block font-medium mb-1">Skin Photo</label>
-                <input type="file" name="skin_photo" accept="image/*"
-                    class="w-full px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
+            <div class="lg:col-span-2">
+                <label class="block font-medium mb-1 text-sm sm:text-base">Skin Photo</label>
+                <input type="file" name="skin_photo" accept="image/*" required
+                    class="w-full px-3 sm:px-4 py-2 border border-[#EBD5DC] rounded bg-white focus:outline-none focus:ring-2 focus:ring-[#916D7A] text-sm sm:text-base file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#916D7A] file:text-white hover:file:bg-[#6E4B57]" />
             </div>
 
             <!-- Submit -->
-            <div class="text-center pt-4">
+            <div class="lg:col-span-2 text-center pt-4 sm:pt-6">
                 <button type="submit" name="btnsubmit"
-                    class="px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#6E4B57] transition font-semibold">
+                    class="w-full sm:w-auto px-6 py-2 bg-[#916D7A] text-white rounded hover:bg-[#6E4B57] transition font-semibold text-sm sm:text-base">
                     Submit
                 </button>
             </div>
         </form>
     </div>
-
 
     <?php include 'footer.php'; ?>
 </body>
