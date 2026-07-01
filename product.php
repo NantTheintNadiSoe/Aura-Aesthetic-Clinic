@@ -23,7 +23,7 @@ if (isset($_POST['btnsubmit'])) {
     $quantity = $_POST['quantity'];
     $discount = $_POST['discount'];
     $description = $_POST['description'];
-    $status = 'Available';  
+    $status = 'Available';
 
     // Handle image upload
     if (isset($_FILES['fileimage'])) {

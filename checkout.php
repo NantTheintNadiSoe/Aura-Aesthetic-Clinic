@@ -127,7 +127,7 @@ if (isset($_POST['btnPlaceOrder'])) {
             </table>
         </div>
 
-   
+
         <div class="bg-white p-6 rounded-lg shadow-md border border-[#EBD5DC] w-full mb-10">
             <p class="text-lg font-semibold text-[#4A2C35] mb-2">
                 Total Quantity: <span class="font-mono"><?php echo CalculateTotalQuantity(); ?></span>
@@ -161,6 +161,22 @@ if (isset($_POST['btnPlaceOrder'])) {
                 <input type="file" name="payment_screenshot" accept="image/*" required class="border border-[#EBD5DC] px-5 py-3 rounded-lg text-[#4A2C35] focus:outline-none focus:ring-2 focus:ring-[#916D7A]" />
 
                 <button type="submit" name="btnPlaceOrder" class="bg-[#916D7A] text-white py-3 rounded-lg hover:bg-[#6E4B57] transition font-semibold shadow-md">Place Order</button>
+            </div>
+            <!-- Bank and Mobile Wallet Information -->
+            <div class="mt-6 bg-[#FAF2F5] p-4 rounded-lg border border-[#EBD5DC] text-[#4A2C35]">
+                <h3 class="font-bold text-[#916D7A] mb-2">Payment Information – Aura Aesthetic Clinic</h3>
+                <p class="mb-2"><strong>Mobile Wallets:</strong></p>
+                <ul class="mb-2 list-disc list-inside">
+                    <li>KPay: 09 123 456 789</li>
+                    <li>Wave Pay: 09 987 654 321</li>
+                    <li>Aya Pay: 09 555 888 999</li>
+                </ul>
+                <p class="mb-2"><strong>Bank Accounts:</strong></p>
+                <ul class="list-disc list-inside">
+                    <li>AYA Bank (Aura Aesthetic Clinic): 123-456-7890</li>
+                    <li>KBZ Bank (Aura Aesthetic Clinic): 987-654-3210</li>
+                </ul>
+                <p class="mt-2 text-sm text-[#6E4B57]">After transferring the payment, please upload a screenshot of your payment to confirm your order.</p>
             </div>
         </form>
     </section>
